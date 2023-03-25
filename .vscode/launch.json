@@ -1,0 +1,27 @@
+{
+  "configurations": [
+    {
+      "name": "three msvc",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/src/three/Debug/three.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/src/three/assets",
+      "environment": [],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "three lldb",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/src/three/three",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/src/three/assets",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb"
+    }
+  ]
+}

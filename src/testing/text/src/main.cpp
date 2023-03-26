@@ -22,12 +22,33 @@ int main()
 	sgl::mat4 persp = sgl::perspective<float>(45.f, 1, 0.1f, 1000);
 	sgl::set_projection(&persp);
 
-	sgl::camera cam({0, 0, -1}, {0, 0, 0});
+	sgl::camera cam({ 0, 0, -1 }, { 0, 0, 0 });
 	bool cam_changed = false;
 	sgl::mat4 view = cam.view();
 	sgl::set_view(&view);
 
-	sgl::cube_obj<false> cube({}, { 2, 2, 2 });
+	sgl::font f("arial.ttf", 128);
+	sgl::text test("Test", f);
+	test.set_scale({ 100.f / 128, 100.f / 128 });
+
+	sgl::vec2 min(10, 10);
+	auto test_rect = test.get_local_rect();
+	test.set_text_origin(min - test_rect.min);
+	sgl::rectangle_obj<false> test_rect_obj(min, test_rect.dims);
+	sgl::text text("Testing", f);
+	text.set_text_origin({ 0, 0, 0 });
+	text.set_scale({ 1 / 128.f, 1 / 128.f });
+	{
+		auto bound = text.get_local_rect();
+		text.set_text_origin(text.get_text_origin() - sgl::vec3{ bound.min.x + bound.dims.x / 2, 0, 0 });
+		text.set_rot_axis({ 0, 1, 0 });
+	}
+
+	sgl::mat4 ortho = sgl::ortho_mat(0, window.drawable_size().x, 0, window.drawable_size().y, -1, 1);
+
+	sgl::text fps("0", f);
+	fps.set_text_origin({ 10, 500 - 70, 0 });
+	fps.set_scale({ .5, .5 });
 
 	auto cursor_callback = [&cam_changed, &cam, &window](double x, double y)
 	{
@@ -50,10 +71,10 @@ int main()
 
 	window.set_cursor_callback(cursor_callback);
 
-	auto framebuffer_callback = [&persp/*, &ortho */ ](int width, int height)
+	auto framebuffer_callback = [&persp, &ortho](int width, int height)
 	{
 		persp = sgl::perspective<float>(45.f, (float)width / height, 0.1f, 100);
-		//ortho = sgl::ortho_mat(0, width, 0, height, -1, 1);
+		ortho = sgl::ortho_mat(0, width, 0, height, -1, 1);
 	};
 
 	window.set_framebuffer_callback(framebuffer_callback);
@@ -107,13 +128,18 @@ int main()
 		if (cam_changed)
 			view = cam.view();
 
-		window.clear({1, 1, 1, 1});
+		text.set_angle(text.get_angle() + sgl::pi() * (float)dt.seconds());
 
-		sgl::set_draw_color({0, 0, 0, .2});
-		draw_grid(window, {-10, -10}, {10, 10}, 1);
+		window.clear({ 1, 1, 1, 1 });
 
-		sgl::set_draw_color({ 1, 0, 0, 1 });
-		window.draw(cube);
+		sgl::set_projection(&persp);
+		sgl::set_view(&view);
+
+		sgl::set_draw_color({ 0, 0, 0, .2 });
+		draw_grid(window, { -10, -10 }, { 10, 10 }, 1);
+
+		sgl::set_draw_color({ 0, 0, 0, 1 });
+		window.draw(text);
 
 		window.swap_buffers();
 

@@ -27,8 +27,8 @@ namespace shapes_detail
 
 		buffer.use();
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, dim, GL_FLOAT, GL_FALSE, 0, (void *)0);
+		glEnableVertexAttribArray(render_shader::pos_attribute_loc);
+		glVertexAttribPointer(render_shader::pos_attribute_loc, dim, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
 		return res;
 	}

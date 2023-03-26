@@ -216,12 +216,12 @@ namespace text_detail
 			static auto text_pts_buffer = text_pts_data.get_buffer();
 
 			global_defaults::rect_obj_vbo().use();
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+			glEnableVertexAttribArray(render_shader::pos_attribute_loc);
+			glVertexAttribPointer(render_shader::pos_attribute_loc, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
 			text_pts_buffer.use();
-			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+			glEnableVertexAttribArray(render_shader::textPos_attribute_loc);
+			glVertexAttribPointer(render_shader::textPos_attribute_loc, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
 		}
 
 		void draw(render_target &target) const override

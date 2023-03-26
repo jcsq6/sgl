@@ -22,23 +22,12 @@ int main()
 	sgl::mat4 persp = sgl::perspective<float>(45.f, 1, 0.1f, 1000);
 	sgl::set_projection(&persp);
 
-	sgl::camera cam({0, 0, -1}, {0, 0, 0});
+	sgl::camera cam({ 0, 0, -1 }, { 0, 0, 0 });
 	bool cam_changed = false;
 	sgl::mat4 view = cam.view();
 	sgl::set_view(&view);
 
-	sgl::mat4 ortho = sgl::ortho_mat(0, window.drawable_size().x, 0, window.drawable_size().y, -1, 1);
-
-	sgl::cube_obj<true> cube({}, { 2, 2, 2 });
-	cube.set_rot_axis({ 0, 1, 0 });
-	cube.set_rot_origin({ 1, 1, 1 });
-	
-	sgl::rectangle_obj rect({ 3, 2, 0 }, { 2, 1 }, {0, 0, 1});
-	
-	sgl::point_obj<2> pt_2d({0, 3}, .1);
-	sgl::point_obj<3> pt_3d({ 0, 4, 0 }, .1);
-
-	sgl::line_obj<false, false> line({ 0, 0, 4 }, { 2, 4, 0 });
+	sgl::cube_obj<false> cube({}, { 2, 2, 2 });
 
 	auto cursor_callback = [&cam_changed, &cam, &window](double x, double y)
 	{
@@ -61,10 +50,10 @@ int main()
 
 	window.set_cursor_callback(cursor_callback);
 
-	auto framebuffer_callback = [&persp, &ortho](int width, int height)
+	auto framebuffer_callback = [&persp/*, &ortho */](int width, int height)
 	{
 		persp = sgl::perspective<float>(45.f, (float)width / height, 0.1f, 100);
-		ortho = sgl::ortho_mat(0, width, 0, height, -1, 1);
+		//ortho = sgl::ortho_mat(0, width, 0, height, -1, 1);
 	};
 
 	window.set_framebuffer_callback(framebuffer_callback);
@@ -118,27 +107,13 @@ int main()
 		if (cam_changed)
 			view = cam.view();
 
-		cube.set_angle(cube.get_angle() + (float)dt.seconds() * sgl::pi());
+		window.clear({ 1, 1, 1, 1 });
 
-		window.clear({1, 1, 1, 1});
-
-		sgl::set_draw_color({0, 0, 0, .2});
-		draw_grid(window, {-10, -10}, {10, 10}, 1);
+		sgl::set_draw_color({ 0, 0, 0, .2 });
+		draw_grid(window, { -10, -10 }, { 10, 10 }, 1);
 
 		sgl::set_draw_color({ 1, 0, 0, 1 });
 		window.draw(cube);
-
-		sgl::set_draw_color({ 0, 1, 0, 1 });
-		window.draw(rect);
-
-		sgl::set_draw_color({ 1, 1, 0, 1 });
-		window.draw(pt_2d);
-
-		sgl::set_draw_color({ 1, 0, 1, 1 });
-		window.draw(pt_3d);
-
-		sgl::set_draw_color({ 0, 0, 0, 1 });
-		window.draw(line);
 
 		window.swap_buffers();
 

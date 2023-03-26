@@ -22,33 +22,23 @@ int main()
 	sgl::mat4 persp = sgl::perspective<float>(45.f, 1, 0.1f, 1000);
 	sgl::set_projection(&persp);
 
-	sgl::camera cam({0, 0, -1}, {0, 0, 0});
+	sgl::camera cam({ 0, 0, -1 }, { 0, 0, 0 });
 	bool cam_changed = false;
 	sgl::mat4 view = cam.view();
 	sgl::set_view(&view);
 
-	sgl::font f("arial.ttf", 128);
-	sgl::text test("Test", f);
-	test.set_scale({100.f / 128, 100.f / 128});
-
-	sgl::vec2 min(10, 10);
-	auto test_rect = test.get_local_rect();
-	test.set_text_origin(min - test_rect.min);
-	sgl::rectangle_obj<false> test_rect_obj(min, test_rect.dims);
-	sgl::text text ("I fucked yo bitch in the ass last night faggot", f);
-	text.set_text_origin({0, 0, 0});
-	text.set_scale({1 / 128.f, 1 / 128.f});
-	{
-		auto bound = text.get_local_rect();
-		text.set_text_origin(text.get_text_origin() - sgl::vec3{bound.min.x + bound.dims.x / 2, 0, 0});
-		text.set_rot_axis({0, 1, 0});
-	}
-
 	sgl::mat4 ortho = sgl::ortho_mat(0, window.drawable_size().x, 0, window.drawable_size().y, -1, 1);
 
-	sgl::text fps("0", f);
-	fps.set_text_origin({10, 500 - 70, 0});
-	fps.set_scale({.5, .5});
+	sgl::cube_obj<true> cube({}, { 2, 2, 2 });
+	cube.set_rot_axis({ 0, 1, 0 });
+	cube.set_rot_origin({ 1, 1, 1 });
+
+	sgl::rectangle_obj rect({ 3, 2, 0 }, { 2, 1 }, { 0, 0, 1 });
+
+	sgl::point_obj<2> pt_2d({ 0, 3 }, .1);
+	sgl::point_obj<3> pt_3d({ 0, 4, 0 }, .1);
+
+	sgl::line_obj<false, false> line({ 0, 0, 4 }, { 2, 4, 0 });
 
 	auto cursor_callback = [&cam_changed, &cam, &window](double x, double y)
 	{
@@ -128,18 +118,27 @@ int main()
 		if (cam_changed)
 			view = cam.view();
 
-		text.set_angle(text.get_angle() + sgl::pi() * (float)dt.seconds());
+		cube.set_angle(cube.get_angle() + (float)dt.seconds() * sgl::pi());
 
-		window.clear({1, 1, 1, 1});
+		window.clear({ 1, 1, 1, 1 });
 
-		sgl::set_projection(&persp);
-		sgl::set_view(&view);
+		sgl::set_draw_color({ 0, 0, 0, .2 });
+		draw_grid(window, { -10, -10 }, { 10, 10 }, 1);
 
-		sgl::set_draw_color({0, 0, 0, .2});
-		draw_grid(window, {-10, -10}, {10, 10}, 1);
+		sgl::set_draw_color({ 1, 0, 0, 1 });
+		window.draw(cube);
 
-		sgl::set_draw_color({0, 0, 0, 1});
-		window.draw(text);
+		sgl::set_draw_color({ 0, 1, 0, 1 });
+		window.draw(rect);
+
+		sgl::set_draw_color({ 1, 1, 0, 1 });
+		window.draw(pt_2d);
+
+		sgl::set_draw_color({ 1, 0, 1, 1 });
+		window.draw(pt_3d);
+
+		sgl::set_draw_color({ 0, 0, 0, 1 });
+		window.draw(line);
 
 		window.swap_buffers();
 

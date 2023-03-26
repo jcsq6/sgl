@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4)
 
 file(GLOB_RECURSE SRC CONFIGURE_DEPEND "*.cpp")
 
-add_executable(shapes ${SRC})
+add_executable(shapes WIN32 ${SRC})
 
 target_include_directories(shapes PUBLIC include)
 

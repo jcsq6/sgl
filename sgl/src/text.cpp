@@ -7,7 +7,7 @@
 
 #include "object/sprite.h"
 
-#include "defaults.h"
+#include "help.h"
 
 #include <stdexcept>
 #include <algorithm>
@@ -169,31 +169,6 @@ namespace text_detail
 		return shader;
 	}
 
-	inline void setup_shader(const gtexture &text, const mat4 &m, render_shader &program)
-	{
-		program.set_texture_uniform(text);
-		program.set_color_uniform(get_draw_color());
-
-		auto *v = get_view();
-		auto *p = get_projection();
-
-		if (!p)
-			p = &global_defaults::identity_ref();
-		if (!v)
-			v = &global_defaults::identity_ref();
-
-		if (program.has_modelViewProj_uniform())
-			program.set_modelViewProj_uniform((*p) * (*v) * m);
-		if (program.has_model_uniform())
-			program.set_model_uniform(m);
-		if (program.has_view_uniform())
-			program.set_view_uniform(*v);
-		if (program.has_proj_uniform())
-			program.set_proj_uniform(*p);
-	
-		program.bind();
-	}
-
 	class char_type : public render_type
 	{
 	public:
@@ -215,7 +190,7 @@ namespace text_detail
 
 			static auto text_pts_buffer = text_pts_data.get_buffer();
 
-			global_defaults::rect_obj_vbo().use();
+			detail::rect_obj_vbo().use();
 			glEnableVertexAttribArray(render_shader::pos_attribute_loc);
 			glVertexAttribPointer(render_shader::pos_attribute_loc, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
@@ -263,7 +238,7 @@ namespace text_detail
 
 			glDisable(GL_CULL_FACE);
 
-			text_detail::setup_shader(*m_texture, base_transformable_obj::model, text_detail::get_shader());
+			detail::setup_shader(*m_texture, base_transformable_obj::model, text_detail::get_shader());
 
 			render_obj::type->draw(target);
 		}

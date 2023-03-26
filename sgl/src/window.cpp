@@ -52,15 +52,8 @@ std::map<GLFWwindow *, callbacks> window_callbacks;
 
 void framebuffer_callback(GLFWwindow *window, int width, int height) { window_callbacks[window].framebuffer(width, height); }
 
-void error(int error, const char *msg)
-{
-	std::cerr << '[' << error << "] " << msg << '\n';
-}
-
 window::window(int width, int height, std::string_view name, window::creation_hints hints) : m_window{}, logical_size{-1, -1}
 {
-	glfwSetErrorCallback(error);
-
 	get_glfwlib();
 
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);

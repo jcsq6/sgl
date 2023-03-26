@@ -15,26 +15,28 @@ namespace variables
 		sgl_Model = 0x0004,
 		// uniform for projection matrix
 		sgl_Proj = 0x0008,
+		// uniform for view * model matrix
+		sgl_ModelView = 0x0010,
 		// uniform for proj * view * model matrix
-		sgl_ModelViewProj = 0x0010,
+		sgl_ModelViewProj = 0x0020,
 		// uniform for texture 
-		sgl_Texture = 0x0020,
+		sgl_Texture = 0x0040,
 		// attribute for vertex input into vertex shader
-		sgl_Pos = 0x0040,
+		sgl_Pos = 0x0080,
 		// attribute for normal input into vertex shader
-		sgl_Normal = 0x0080,
+		sgl_Normal = 0x0100,
 		// attribute for color input into vertex shader
-		sgl_ColorAttrib = 0x0100,
+		sgl_ColorAttrib = 0x0200,
 		// attribute for texture coordinates into vertex shader
-		sgl_TextPos = 0x0200,
+		sgl_TextPos = 0x0400,
 		// output of vertex shader/ input to fragment shader for vertex position
-		sgl_VertPos = 0x0400,
+		sgl_VertPos = 0x0800,
 		// output of vertex shader/ input to fragment shader for vertex normal
-		sgl_VertNormal = 0x0800,
+		sgl_VertNormal = 0x1000,
 		// output of vertex shader/ input to fragment shader for vertex color
-		sgl_VertColor = 0x1000,
+		sgl_VertColor = 0x2000,
 		// output of vertex shader/ input to fragment shader for texture coordinates
-		sgl_VertTextPos = 0x2000,
+		sgl_VertTextPos = 0x4000,
 	};
 
 	template <variable_type type>
@@ -57,7 +59,8 @@ namespace variables
 }
 
 /// <summary>
-/// Standardized shader program class with standard variables that must be used
+/// Standardized shader program class with standard variables
+/// All variables that have been set to be included will be fulfilled by drawing operations
 /// TODO: add ModelView uniform
 /// OPTIONAL VARIABLES
 /// Standardized uniforms
@@ -111,6 +114,7 @@ public:
 	inline void set_view_uniform(const mat4 &view) { m_shader.set_uniform(variables::variable_name<variables::sgl_View>, view); }
 	inline void set_model_uniform(const mat4 &model) { m_shader.set_uniform(variables::variable_name<variables::sgl_Model>, model); }
 	inline void set_proj_uniform(const mat4 &proj) { m_shader.set_uniform(variables::variable_name<variables::sgl_Proj>, proj); }
+	inline void set_modelView_uniform(const mat4 &modelView) { m_shader.set_uniform(variables::variable_name<variables::sgl_ModelView>, modelView); }
 	inline void set_modelViewProj_uniform(const mat4 &modelViewProj) { m_shader.set_uniform(variables::variable_name<variables::sgl_ModelViewProj>, modelViewProj); }
 	inline void set_texture_uniform(const gtexture &texture) { m_shader.set_uniform(variables::variable_name<variables::sgl_Texture>, texture); }
 
@@ -118,6 +122,7 @@ public:
 	inline bool has_view_uniform() const { return m_includes & variables::sgl_View; }
 	inline bool has_model_uniform() const { return m_includes & variables::sgl_Model; }
 	inline bool has_proj_uniform() const { return m_includes & variables::sgl_Proj; }
+	inline bool has_modelView_uniform() const { return m_includes & variables::sgl_ModelView; }
 	inline bool has_modelViewProj_uniform() const { return m_includes & variables::sgl_ModelViewProj; }
 	inline bool has_texture_uniform() const { return m_includes & variables::sgl_Texture; }
 	inline bool has_pos_attribute() const { return m_includes & variables::sgl_Pos; }

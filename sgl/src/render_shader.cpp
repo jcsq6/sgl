@@ -39,6 +39,12 @@ void render_shader::generate_shader(const std::string &vertex, const std::string
 		vertex_src += val;
 		frag_src += val;
 	}
+	if (has_modelView_uniform())
+	{
+		static std::string val = "uniform mat4 " + variable_name<sgl_ModelView> +';';
+		vertex_src += val;
+		frag_src += val;
+	}
 	if (has_modelViewProj_uniform())
 	{
 		static std::string val = "uniform mat4 " + variable_name<sgl_ModelViewProj> + ';';

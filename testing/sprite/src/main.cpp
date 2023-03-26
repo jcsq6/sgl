@@ -1,10 +1,7 @@
 #include <sgl.h>
-#include <object/shapes.h>
 #include <object/camera.h>
 #include <utils/timer.h>
 #include <object/sprite.h>
-#include <object/text.h>
-#include <iostream>
 
 #ifdef _WIN32
 #define main WinMain
@@ -14,7 +11,7 @@ void draw_grid(sgl::render_target &target, sgl::vec2 min, sgl::vec2 max, float g
 
 int main()
 {
-	sgl::window window(500, 500, "work");
+	sgl::window window(500, 500, "sprite");
 	window.set_logical_size(500, 500);
 	window.set_swap_interval(1);
 
@@ -31,7 +28,9 @@ int main()
 	sgl::mat4 view = cam.view();
 	sgl::set_view(&view);
 
-	sgl::cube_obj<false> cube({}, { 2, 2, 2 });
+	sgl::gtexture texture("image.png", GL_RGBA);
+	sgl::sprite<true> sprite(texture, {}, {2, 1});
+	sprite.set_rot_axis({ 0,1,0 });
 
 	auto cursor_callback = [&cam_changed, &cam, &window](double x, double y)
 	{
@@ -54,10 +53,9 @@ int main()
 
 	window.set_cursor_callback(cursor_callback);
 
-	auto framebuffer_callback = [&persp/*, &ortho */](int width, int height)
+	auto framebuffer_callback = [&persp](int width, int height)
 	{
 		persp = sgl::perspective<float>(45.f, (float)width / height, 0.1f, 100);
-		//ortho = sgl::ortho_mat(0, width, 0, height, -1, 1);
 	};
 
 	window.set_framebuffer_callback(framebuffer_callback);
@@ -111,13 +109,14 @@ int main()
 		if (cam_changed)
 			view = cam.view();
 
+		sprite.set_angle(sprite.get_angle() + sgl::pi() * (float)dt.seconds());
+
 		window.clear({ 1, 1, 1, 1 });
 
 		sgl::set_draw_color({ 0, 0, 0, .2 });
 		draw_grid(window, { -10, -10 }, { 10, 10 }, 1);
 
-		sgl::set_draw_color({ 1, 0, 0, 1 });
-		window.draw(cube);
+		window.draw(sprite);
 
 		window.swap_buffers();
 

@@ -7,7 +7,7 @@
 #include "shaders/shaders.h"
 #include "math/mat.h"
 
-#include "defaults.h"
+#include "help.h"
 
 SGL_BEG
 
@@ -20,32 +20,6 @@ namespace sprite_detail
 		static std::string fragment_source = "void main() { sgl_OutColor = texture(sgl_Texture, sgl_VertTextPos); }";
 		static sgl::render_shader shader(vertex_source, fragment_source, sgl_ModelViewProj | sgl_Pos | sgl_TextPos | sgl_VertTextPos | sgl_Texture);
 		return shader;
-	}
-
-	inline void setup_shader(const gtexture &text, const mat4 &m, render_shader &program)
-	{
-
-		program.set_texture_uniform(text);
-		program.set_color_uniform(get_draw_color());
-
-		auto *v = get_view();
-		auto *p = get_projection();
-
-		if (!p)
-			p = &global_defaults::identity_ref();
-		if (!v)
-			v = &global_defaults::identity_ref();
-
-		if (program.has_modelViewProj_uniform())
-			program.set_modelViewProj_uniform((*p) * (*v) * m);
-		if (program.has_model_uniform())
-			program.set_model_uniform(m);
-		if (program.has_view_uniform())
-			program.set_view_uniform(*v);
-		if (program.has_proj_uniform())
-			program.set_proj_uniform(*p);
-
-		program.bind();
 	}
 }
 
@@ -70,7 +44,7 @@ public:
 
 		static auto text_pts_buffer = text_pts_data.get_buffer();
 
-		global_defaults::rect_obj_vbo().use();
+		detail::rect_obj_vbo().use();
 		glEnableVertexAttribArray(render_shader::pos_attribute_loc);
 		glVertexAttribPointer(render_shader::pos_attribute_loc, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
 
@@ -115,7 +89,7 @@ void sprite<rotatable>::draw(render_target& target) const
 
 	rectangle_obj<rotatable>::setup_buffer();
 	
-	sprite_detail::setup_shader(*m_texture, base_transformable_obj::model, sprite_detail::get_shader());
+	detail::setup_shader(*m_texture, base_transformable_obj::model, sprite_detail::get_shader());
 
 	render_obj::type->draw(target);
 }

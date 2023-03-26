@@ -1,16 +1,17 @@
-#include <window/window.h>
+#include <sgl.h>
 #include <object/shapes.h>
 #include <object/camera.h>
 #include <utils/timer.h>
-#include <object/sprite.h>
-#include <object/text.h>
-#include <iostream>
+
+#ifdef _WIN32
+#define main WinMain
+#endif
 
 void draw_grid(sgl::render_target &target, sgl::vec2 min, sgl::vec2 max, float grid_size);
 
 int main()
 {
-	sgl::window window(500, 500, "three");
+	sgl::window window(500, 500, "shapes");
 	window.set_logical_size(500, 500);
 	window.set_swap_interval(1);
 

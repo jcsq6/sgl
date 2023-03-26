@@ -1,6 +1,6 @@
 #include "object/shapes.h"
 #include "object/render_target.h"
-#include "defaults.h"
+#include "help.h"
 #include "context_lock/context_lock.h"
 
 SGL_BEG
@@ -32,30 +32,6 @@ namespace shapes_detail
 
 		return res;
 	}
-
-	void setup_shader(const mat4 &m, render_shader &program)
-	{
-		program.set_color_uniform(get_draw_color());
-
-		auto *v = get_view();
-		auto *p = get_projection();
-
-		if (!p)
-			p = &global_defaults::identity_ref();
-		if (!v)
-			v = &global_defaults::identity_ref();
-
-		if (program.has_modelViewProj_uniform())
-			program.set_modelViewProj_uniform((*p) * (*v) * m);
-		if (program.has_model_uniform())
-			program.set_model_uniform(m);
-		if (program.has_view_uniform())
-			program.set_view_uniform(*v);
-		if (program.has_proj_uniform())
-			program.set_proj_uniform(*p);
-
-		program.bind();
-	}
 }
 
 class cube_type : public render_type
@@ -63,7 +39,7 @@ class cube_type : public render_type
 public:
 	cube_type() : render_type()
 	{
-		static vbo _vbo = global_defaults::cube_pts().get_buffer();
+		static vbo _vbo = detail::cube_pts().get_buffer();
 		m_vao = shapes_detail::make_shape_vao(_vbo, 3);
 	}
 
@@ -102,7 +78,7 @@ void cube_obj<rotatable>::draw(render_target& target) const
 
 	detail::shader_lock slock;
 
-	shapes_detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
+	detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
 
 	render_obj::type->draw(target);
 }
@@ -110,7 +86,7 @@ void cube_obj<rotatable>::draw(render_target& target) const
 class rectangle_type : public render_type
 {
 public:
-	rectangle_type() : render_type(shapes_detail::make_shape_vao(global_defaults::rect_obj_vbo(), 3)) {}
+	rectangle_type() : render_type(shapes_detail::make_shape_vao(detail::rect_obj_vbo(), 3)) {}
 
 	void draw(render_target& target) const override
 	{
@@ -153,7 +129,7 @@ void rectangle_obj<rotatable>::draw(render_target& target) const
 
 	setup_buffer();
 	
-	shapes_detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
+	detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
 
 	render_obj::type->draw(target);
 }
@@ -213,7 +189,7 @@ void point_obj<2>::draw(render_target& target) const
 		data[3] = { -half, half, 0 };
 	}
 
-	shapes_detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
+	detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
 
 	render_obj::type->draw(target);
 }
@@ -233,7 +209,7 @@ void point_obj<3>::draw(render_target& target) const
 
 	detail::shader_lock slock;
 
-	shapes_detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
+	detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
 
 	render_obj::type->draw(target);
 }
@@ -364,7 +340,7 @@ void line_obj<scalable, rotatable>::draw(render_target& target) const
 
 	setup_buffer();
 
-	shapes_detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
+	detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
 
 	render_obj::type->draw(target);
 }

@@ -1,4 +1,5 @@
 #pragma once
+
 #define SGL_BEG   \
 	namespace sgl \
 	{

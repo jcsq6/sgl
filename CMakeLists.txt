@@ -4,4 +4,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 project ("sgl")
 
-add_subdirectory ("src")
+add_subdirectory(sgl)
+add_subdirectory(testing)
+
+add_custom_target(three_target DEPENDS sgl work)

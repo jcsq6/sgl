@@ -1,6 +1,7 @@
 #include <sgl.h>
 #include <object/shapes.h>
 #include <object/camera.h>
+#include <shaders/shaders.h>
 #include <utils/timer.h>
 #include <object/sprite.h>
 #include <object/text.h>

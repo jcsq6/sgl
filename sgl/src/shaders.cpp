@@ -1,5 +1,6 @@
 #include "shaders/shaders.h"
 #include "context_lock/context_lock.h"
+#include "utils/error.h"
 #include <GL/glew.h>
 #include <iostream>
 
@@ -49,17 +50,19 @@ public:
 		glGetShaderiv(id, GL_COMPILE_STATUS, &completed);
 		if (completed == GL_FALSE)
 		{
-			std::cerr << "shader compilation failed!\n";
+			std::string message = "Shader compilation failed.";
 			int length{};
 			glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
 			if (length)
 			{
+				message += " Log: ";
+				std::size_t old_len = message.size();
+				message.resize(old_len + length);
 				int d{};
-				char *log = new char[length];
-				glGetShaderInfoLog(id, length, &d, log);
-				std::cerr << "shader Log: " << log << "\n";
-				delete[] log;
+				glGetShaderInfoLog(id, length, &d, message.data() + old_len);
 			}
+
+			detail::log_error(error(std::move(message), error_code::shader_compilation_failure));
 		}
 	}
 
@@ -85,17 +88,19 @@ unsigned int get_program(Ts &&...shaders)
 	glGetProgramiv(id, GL_LINK_STATUS, &completed);
 	if (completed == GL_FALSE)
 	{
+		std::string message = "Program compilation failed.";
 		int length{};
-
 		glGetProgramiv(id, GL_INFO_LOG_LENGTH, &length);
 		if (length)
 		{
+			message += " Log: ";
+			std::size_t old_len = message.size();
+			message.resize(old_len + length);
 			int d{};
-			char *log{new char[length]};
-			glGetProgramInfoLog(id, length, &d, log);
-			std::cerr << "Program Log: " << log << "\n";
-			delete[] log;
+			glGetProgramInfoLog(id, length, &d, message.data() + old_len);
 		}
+
+		detail::log_error(error(std::move(message), error_code::shader_compilation_failure));
 	}
 
 	return id;

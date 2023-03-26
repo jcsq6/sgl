@@ -7,6 +7,8 @@
 
 #include "object/sprite.h"
 
+#include "utils/error.h"
+
 #include "help.h"
 
 #include <stdexcept>
@@ -25,7 +27,7 @@ struct library_handle
 	library_handle() : library{}
 	{
 		if (FT_Init_FreeType(&library))
-			throw std::runtime_error("could not initialize freetype");
+			detail::log_error(error("Could not initialize freetype.", error_code::freetype_initialization_failure));
 	}
 	~library_handle()
 	{
@@ -45,12 +47,12 @@ font::face_handle::face_handle() : face{}, size{default_height} {}
 void font::face_handle::load(detail::library_handle &lib, const std::string &file_name)
 {
 	if (FT_New_Face(lib.library, file_name.data(), 0, &face))
-		throw std::runtime_error("could not load font");
+		detail::log_error(error("Could not load font " + file_name + '.', error_code::freetype_font_failure));
 }
 void font::face_handle::load(detail::library_handle &lib, const void *data, std::size_t size)
 {
 	if (FT_New_Memory_Face(lib.library, reinterpret_cast<const FT_Byte *>(data), static_cast<FT_Long>(size), 0, &face))
-		throw std::runtime_error("could not load font");
+		detail::log_error(error("Could not load font.", error_code::freetype_font_failure));
 }
 
 font::face_handle::~face_handle()
@@ -133,7 +135,10 @@ void font::character::load(const font *_font, uint32_t c)
 
 	FT_Face face = _font->face.face;
 	if (FT_Load_Char(face, c, FT_LOAD_RENDER))
-		throw std::runtime_error("couldn't load character");
+	{
+		detail::log_error(error("Couldn't load character", error_code::freetype_invalid_character));
+		return;
+	}
 	text.load(GL_RGBA, face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows, 1);
 	offset.x = face->glyph->bitmap_left;
 	offset.y = face->glyph->bitmap_top;

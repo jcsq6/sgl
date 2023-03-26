@@ -1,6 +1,6 @@
 #include "window/window.h"
 
-#include <stdexcept>
+#include "utils/error.h"
 
 #include <iostream>
 
@@ -13,14 +13,16 @@ struct sgl_glfw
 {
 	sgl_glfw()
 	{
-		auto res = glfwInit();
+		res = glfwInit();
 		if (res != GLFW_TRUE)
-			throw std::runtime_error("glfw initialization failed with code " + std::to_string(res));
+			detail::log_error(error("GLFW initializatino failed with code " + std::to_string(res) + '.', error_code::glfw_initialization_failure));
 	}
 	~sgl_glfw()
 	{
 		glfwTerminate();
 	}
+
+	int res;
 };
 
 sgl_glfw &get_glfwlib()
@@ -54,7 +56,8 @@ void framebuffer_callback(GLFWwindow *window, int width, int height) { window_ca
 
 window::window(int width, int height, std::string_view name, window::creation_hints hints) : m_window{}, logical_size{-1, -1}
 {
-	get_glfwlib();
+	if (get_glfwlib().res != GLFW_TRUE)
+		return;
 
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -82,12 +85,14 @@ window::window(int width, int height, std::string_view name, window::creation_hi
 	glfwSetFramebufferSizeCallback(m_window, framebuffer_callback);
 	set_framebuffer_callback();
 
-	if (!m_window)
-		throw std::runtime_error("Couldn't create window");
-
-	glfwMakeContextCurrent(m_window);
-	if (glewInit() != GLEW_OK)
-		throw std::runtime_error("Couldn't load glew");
+	if (m_window)
+	{
+		glfwMakeContextCurrent(m_window);
+		if (glewInit() != GLEW_OK)
+			detail::log_error(error("Couldn't load glew.", error_code::glew_initialization_failure));
+	}
+	else
+		detail::log_error(error("Couldn't create window.", error_code::window_creation_failure));
 }
 
 window::~window()

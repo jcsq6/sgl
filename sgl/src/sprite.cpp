@@ -85,6 +85,8 @@ sprite<rotatable>::sprite(const gtexture &texture, vec3 min, vec2 size, vec3 rig
 template <bool rotatable>
 void sprite<rotatable>::draw(render_target& target) const
 {
+	base_transformable_obj::update_model();
+
 	detail::shader_lock vlock;
 
 	rectangle_obj<rotatable>::setup_buffer();

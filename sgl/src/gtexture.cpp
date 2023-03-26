@@ -1,5 +1,7 @@
 #include "object/gtexture.h"
 #include "math/vec.h"
+#include "utils/error.h"
+
 #include <stdexcept>
 #include <algorithm>
 
@@ -24,7 +26,10 @@ void gtexture::load(const std::string &file_name, GLenum target_format)
 	unsigned char *data = stbi_load(file_name.data(), &width, &height, &nr_channels, 0);
 
 	if (!data)
-		throw std::runtime_error("Couldn't open image " + file_name);
+	{
+		detail::log_error(error("Couldn't open image " + file_name, error_code::file_open_failure));
+		return;
+	}
 
 	GLint format;
 
@@ -43,7 +48,8 @@ void gtexture::load(const std::string &file_name, GLenum target_format)
 		format = GL_RGBA;
 		break;
 	default:
-		throw std::runtime_error("Unrecognized image format for image " + file_name);
+		detail::log_error(error("Unrecognized image format for image " + file_name + '.', error_code::unrecognized_file_format));
+		return;
 	}
 
 	switch (target_format)
@@ -62,7 +68,8 @@ void gtexture::load(const std::string &file_name, GLenum target_format)
 		nr_channels = 4;
 		break;
 	default:
-		throw std::runtime_error("Unrecognized image format");
+		detail::log_error(error("Unrecognized target format.", error_code::invalid_argument));
+		return;
 	}
 
 	if (!id)
@@ -100,7 +107,8 @@ void gtexture::load(GLenum target_format, const void *data, GLsizei width, GLsiz
 		pixel_format = GL_RGBA;
 		break;
 	default:
-		throw std::runtime_error("Unrecognized image format");
+		detail::log_error(error("Invalid channel count.", error_code::invalid_argument));
+		return;
 	}
 
 	switch (target_format)
@@ -119,7 +127,8 @@ void gtexture::load(GLenum target_format, const void *data, GLsizei width, GLsiz
 		nr_channels = 4;
 		break;
 	default:
-		throw std::runtime_error("Unrecognized image format");
+		detail::log_error(error("Unrecognized target format.", error_code::invalid_argument));
+		return;
 	}
 
 	if (flip)
@@ -173,7 +182,8 @@ void gtexture::reserve(GLenum target_format, GLsizei width, GLsizei height)
 		nr_channels = 4;
 		break;
 	default:
-		throw std::runtime_error("Unrecognized image format");
+		detail::log_error(error("Unrecognized target format.", error_code::invalid_argument));
+		return;
 	}
 
 	if (!id)

@@ -25,18 +25,6 @@ const mat4 *get_view()
 	return view_value;
 }
 
-vec4 color_value{0, 0, 0, 1};
-
-void set_draw_color(vec4 color)
-{
-	color_value = color;
-}
-
-vec4 get_draw_color()
-{
-	return color_value;
-}
-
 void render_target::clear(vec4 color, GLbitfield mask)
 {
 	detail::fbo_lock flock;
@@ -49,14 +37,35 @@ void render_target::clear(vec4 color, GLbitfield mask)
 	glClear(mask);
 }
 
+void render_target::draw(const render_obj &obj, const render_settings &settings)
+{
+	// trusting that proper context locks are used
+	obj.draw(*this, settings);
+}
+
 void render_target::draw(const render_obj &obj)
 {
 	// trusting that proper context locks are used
 	obj.draw(*this);
 }
 
+ivec2 texture_target::drawable_size() const
+{
+	return { text->get_width(), text->get_height() };
+}
+
+ivec2 texture_target::actual_size() const
+{
+	return drawable_size();
+}
+
+void texture_target::bind_framebuffer()
+{
+	framebuffer.use();
+}
+
 // call this in overrides of render_target::draw, after using proper context locks
-void render_type::bind_target(render_target& target) const
+void render_type::bind_target(render_target &target) const
 {
 	target.view.apply();
 	target.bind_framebuffer();
@@ -67,6 +76,12 @@ void render_obj::bind_target(render_target &target) const
 {
 	target.view.apply();
 	target.bind_framebuffer();
+}
+
+void render_obj::draw(render_target &target) const
+{
+	render_settings settings{ vec4{0, 0, 0, 1}, nullptr, nullptr };
+	draw(target, settings);
 }
 
 void movable_obj::apply_transform() const

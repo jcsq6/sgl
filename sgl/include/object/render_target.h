@@ -7,9 +7,7 @@ SGL_BEG
 
 class render_type;
 class render_obj;
-
-template <unsigned int>
-struct transform;
+struct render_settings;
 
 struct viewport
 {
@@ -32,23 +30,17 @@ const mat4 *get_projection();
 /// @brief set view matrix (view space/camera) for following rendering operations
 /// @param view pointer to view. If nullptr, then no view matrix will be used
 void set_view(const mat4 *view);
+
 /// @brief get view currently used for rendering operations
 /// @return pointer to view matrix
 const mat4 *get_view();
-
-/// @brief sets drawing color to be used for drawing operations if applicable. Not used in render_target::clear
-/// @param color rgba color
-void set_draw_color(vec4 color);
-
-/// @brief get drawing color to be used for drawing operations
-/// @return rgba color
-vec4 get_draw_color();
 
 class render_target
 {
 public:
 	void clear(vec4 color, GLbitfield mask = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	void draw(const render_obj &obj, const render_settings &settings);
 	void draw(const render_obj &obj);
 
 	inline void set_viewport(viewport view)
@@ -78,6 +70,7 @@ protected:
 
 	friend render_obj;
 	friend render_type;
+
 	virtual void bind_framebuffer() = 0;
 };
 
@@ -103,23 +96,14 @@ public:
 		set_logical_viewport();
 	}
 
-	inline ivec2 drawable_size() const override
-	{
-		return {text->get_width(), text->get_height()};
-	}
-
-	inline ivec2 actual_size() const override
-	{
-		return drawable_size();
-	}
+	ivec2 drawable_size() const override;
+	ivec2 actual_size() const override;
 
 private:
 	fbo framebuffer;
 	gtexture *text;
-	void bind_framebuffer() override
-	{
-		framebuffer.use();
-	}
+
+	void bind_framebuffer() override;
 };
 
 SGL_END

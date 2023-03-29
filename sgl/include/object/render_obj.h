@@ -6,8 +6,24 @@
 SGL_BEG
 
 class render_target;
-
 class render_obj;
+
+class render_shader;
+class lighting_engine;
+
+struct render_settings
+{
+	inline render_settings() : color{ 0, 0, 0, 1 }, shader{}, engine{} {}
+	inline render_settings(vec4 col) : color{ col }, shader{}, engine{} {}
+	inline render_settings(render_shader *shader_program) : color{ 0, 0, 0, 1 }, shader{ shader_program }, engine{} {}
+	inline render_settings(const lighting_engine *light_engine) : color{ 0, 0, 0, 1 }, shader{}, engine{ light_engine } {}
+	inline render_settings(render_shader *shader_program, const lighting_engine *light_engine) : color{ 0, 0, 0, 1 }, shader{ shader_program }, engine{ light_engine } {}
+	inline render_settings(vec4 col, render_shader *shader_program, const lighting_engine *light_engine) : color{ col }, shader{ shader_program }, engine{ light_engine } {}
+	
+	vec4 color;
+	render_shader *shader;
+	const lighting_engine *engine;
+};
 
 // render_types are generic types for rendering
 // they don't represent instances
@@ -15,18 +31,18 @@ class render_obj;
 class render_type
 {
 public:
-	inline render_type() = default;
+	render_type() = default;
 	inline render_type(vao &&_vao) : m_vao{std::move(_vao)} {}
 	virtual ~render_type() = default;
 
 	// draws without shader setup
-	virtual void draw(render_target& target) const = 0;
+	virtual void draw(render_target &target) const = 0;
 
 protected:
 	vao m_vao;
 
 	// call before drawing operations
-	void bind_target(render_target& target) const;
+	void bind_target(render_target &target) const;
 
 	friend render_obj;
 };
@@ -35,7 +51,8 @@ protected:
 class render_obj
 {
 public:
-	virtual void draw(render_target& target) const = 0;
+	virtual void draw(render_target &target, const render_settings &settings) const = 0;
+	virtual void draw(render_target &target) const;
 
 	virtual ~render_obj() = default;
 protected:
@@ -43,12 +60,20 @@ protected:
 	inline render_obj() : type{} {}
 
 	// call before drawing operations
-	void bind_target(render_target& target) const;
+	void bind_target(render_target &target) const;
 
 	inline const vao &get_vao() const { return type->m_vao; }
 
 	const render_type *type;
 };
+
+//class render_settings_obj : public render_obj
+//{
+//public:
+//	void draw(render_target &target) const override;
+//	render_settings settings;
+//	render_obj *obj;
+//};
 
 /// @brief transformable render_obj
 /// @tparam movable set to true if the type should include translation transforms
@@ -62,7 +87,7 @@ class transformable_obj<false, false, false> : public virtual render_obj
 {
 public:
 	inline transformable_obj() : render_obj(), model{ identity() }, changed{ true } {}
-	inline transformable_obj(const render_type& rtype) : render_obj(rtype), model{ identity() }, changed{ true } {}
+	inline transformable_obj(const render_type &rtype) : render_obj(rtype), model{ identity() }, changed{ true } {}
 
 	inline const mat4 &get_model() const { return model; }
 

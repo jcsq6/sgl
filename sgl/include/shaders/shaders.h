@@ -8,6 +8,17 @@
 
 SGL_BEG
 
+class shader;
+
+/// <summary>
+/// Used for custom uniform types in shaders, such as materials or lights
+/// </summary>
+class uniform_type
+{
+public:
+	virtual void send(shader &program, const std::string &name) const = 0;
+};
+
 /// <summary>
 /// OpenGL shader class with uniform support
 /// </summary>
@@ -58,7 +69,14 @@ public:
 
 	void set_uniform(const std::string &name, const gtexture &val);
 
-	void bind() const;
+	inline void set_uniform(const std::string &name, const uniform_type &val)
+	{
+		val.send(*this, name);
+	}
+
+	void bind();
+
+	inline unsigned int index() const { return id; }
 
 private:
 	unsigned int id;

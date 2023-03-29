@@ -78,7 +78,20 @@ void cube_obj<rotatable>::draw(render_target& target) const
 
 	detail::shader_lock slock;
 
-	detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
+	detail::setup_shader(shapes_detail::get_shader(), base_transformable_obj::model, nullptr, nullptr, {0, 0, 0, 1});
+
+	render_obj::type->draw(target);
+}
+
+template <bool rotatable>
+void cube_obj<rotatable>::draw(render_target &target, const render_settings &settings) const
+{
+	base_transformable_obj::update_model();
+
+	detail::shader_lock slock;
+
+	render_shader &shader = settings.shader ? *settings.shader : shapes_detail::get_shader();
+	detail::setup_shader(shader, base_transformable_obj::model, settings.engine, nullptr, settings.color);
 
 	render_obj::type->draw(target);
 }
@@ -129,7 +142,22 @@ void rectangle_obj<rotatable>::draw(render_target& target) const
 
 	setup_buffer();
 	
-	detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
+	detail::setup_shader(shapes_detail::get_shader(), base_transformable_obj::model, nullptr, nullptr, { 0, 0, 0, 1 });
+
+	render_obj::type->draw(target);
+}
+
+template <bool rotatable>
+void rectangle_obj<rotatable>::draw(render_target &target, const render_settings &settings) const
+{
+	base_transformable_obj::update_model();
+
+	detail::shader_lock slock;
+
+	setup_buffer();
+
+	render_shader &shader = settings.shader ? *settings.shader : shapes_detail::get_shader();
+	detail::setup_shader(shader, base_transformable_obj::model, settings.engine, nullptr, settings.color);
 
 	render_obj::type->draw(target);
 }
@@ -189,7 +217,33 @@ void point_obj<2>::draw(render_target& target) const
 		data[3] = { -half, half, 0 };
 	}
 
-	detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
+	detail::setup_shader(shapes_detail::get_shader(), base_transformable_obj::model, nullptr, nullptr, { 0, 0, 0, 1 });
+
+	render_obj::type->draw(target);
+}
+
+template <>
+void point_obj<2>::draw(render_target &target, const render_settings &settings) const
+{
+	base_transformable_obj::update_model();
+
+	detail::shader_lock slock;
+
+	// set buffer
+	{
+		auto v = render_obj::get_vao().get_attribute(0);
+
+		auto data = v. template get_data<vec3>(GL_WRITE_ONLY);
+		float half = m_size / 2;
+
+		data[0] = { -half, -half, 0 };
+		data[1] = { half, -half, 0 };
+		data[2] = { half, half, 0 };
+		data[3] = { -half, half, 0 };
+	}
+
+	render_shader &shader = settings.shader ? *settings.shader : shapes_detail::get_shader();
+	detail::setup_shader(shader, base_transformable_obj::model, settings.engine, nullptr, settings.color);
 
 	render_obj::type->draw(target);
 }
@@ -209,7 +263,20 @@ void point_obj<3>::draw(render_target& target) const
 
 	detail::shader_lock slock;
 
-	detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
+	detail::setup_shader(shapes_detail::get_shader(), base_transformable_obj::model, nullptr, nullptr, { 0, 0, 0, 1 });
+
+	render_obj::type->draw(target);
+}
+
+template <>
+void point_obj<3>::draw(render_target &target, const render_settings &settings) const
+{
+	base_transformable_obj::update_model();
+
+	detail::shader_lock slock;
+
+	render_shader &shader = settings.shader ? *settings.shader : shapes_detail::get_shader();
+	detail::setup_shader(shader, base_transformable_obj::model, settings.engine, nullptr, settings.color);
 
 	render_obj::type->draw(target);
 }
@@ -340,7 +407,22 @@ void line_obj<scalable, rotatable>::draw(render_target& target) const
 
 	setup_buffer();
 
-	detail::setup_shader(base_transformable_obj::model, shapes_detail::get_shader());
+	detail::setup_shader(shapes_detail::get_shader(), base_transformable_obj::model, nullptr, nullptr, { 0, 0, 0, 1 });
+
+	render_obj::type->draw(target);
+}
+
+template <bool scalable, bool rotatable>
+void line_obj<scalable, rotatable>::draw(render_target &target, const render_settings &settings) const
+{
+	base_transformable_obj::update_model();
+
+	detail::shader_lock lock;
+
+	setup_buffer();
+
+	render_shader &shader = settings.shader ? *settings.shader : shapes_detail::get_shader();
+	detail::setup_shader(shader, base_transformable_obj::model, settings.engine, nullptr, settings.color);
 
 	render_obj::type->draw(target);
 }

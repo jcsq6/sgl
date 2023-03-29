@@ -83,15 +83,30 @@ sprite<rotatable>::sprite(const gtexture &texture, vec3 min, vec2 size, vec3 rig
 }
 
 template <bool rotatable>
-void sprite<rotatable>::draw(render_target& target) const
+void sprite<rotatable>::draw(render_target &target) const
 {
 	base_transformable_obj::update_model();
 
 	detail::shader_lock vlock;
 
 	rectangle_obj<rotatable>::setup_buffer();
-	
-	detail::setup_shader(*m_texture, base_transformable_obj::model, sprite_detail::get_shader());
+
+	detail::setup_shader(sprite_detail::get_shader(), base_transformable_obj::model, nullptr, m_texture, {0, 0, 0, 1});
+
+	render_obj::type->draw(target);
+}
+
+template <bool rotatable>
+void sprite<rotatable>::draw(render_target &target, const render_settings &settings) const
+{
+	base_transformable_obj::update_model();
+
+	detail::shader_lock vlock;
+
+	rectangle_obj<rotatable>::setup_buffer();
+
+	render_shader &shader = settings.shader ? *settings.shader : sprite_detail::get_shader();
+	detail::setup_shader(shader, base_transformable_obj::model, settings.engine, m_texture, { 0, 0, 0, 1 });
 
 	render_obj::type->draw(target);
 }

@@ -28,7 +28,8 @@ public:
 		m_texture = &texture;
 	}
 
-	void draw(render_target& target) const override;
+	void draw(render_target &target) const override;
+	void draw(render_target &target, const render_settings &settings) const override;
 private:
 	const gtexture* m_texture;
 };

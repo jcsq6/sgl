@@ -5,13 +5,17 @@
 
 SGL_BEG
 DETAIL_BEG
-void setup_shader(const gtexture &text, const mat4 &m, render_shader &program)
+
+void setup_shader(render_shader &program, const mat4 &m, const lighting_engine *engine, const gtexture *text, vec4 color)
 {
-	if (program.has_texture_uniform())
-		program.set_texture_uniform(text);
+	if (program.has_texture_uniform() && text)
+		program.set_texture_uniform(*text);
+
+	if (engine)
+		program.set_lighting_uniforms(*engine);
 
 	if (program.has_color_uniform())
-		program.set_color_uniform(get_draw_color());
+		program.set_color_uniform(color);
 
 	auto *v = get_view();
 	auto *p = get_projection();
@@ -42,43 +46,9 @@ void setup_shader(const gtexture &text, const mat4 &m, render_shader &program)
 	program.bind();
 }
 
-void setup_shader(const mat4 &m, render_shader &program)
+const mat4 &identity_ref()
 {
-	if (program.has_color_uniform())
-		program.set_color_uniform(get_draw_color());
-
-	auto *v = get_view();
-	auto *p = get_projection();
-
-	if (!p)
-		p = &detail::identity_ref();
-	if (!v)
-		v = &detail::identity_ref();
-
-	if (program.has_modelViewProj_uniform() || program.has_modelView_uniform())
-	{
-		mat4 mv = *v;
-		mv *= m;
-
-		if (program.has_modelView_uniform())
-			program.set_modelView_uniform(mv);
-		if (program.has_modelViewProj_uniform())
-			program.set_modelViewProj_uniform((*p) * mv);
-	}
-
-	if (program.has_model_uniform())
-		program.set_model_uniform(m);
-	if (program.has_view_uniform())
-		program.set_view_uniform(*v);
-	if (program.has_proj_uniform())
-		program.set_proj_uniform(*p);
-
-	program.bind();
-}
-
-const mat4 &detail::identity_ref()
-{
-	static auto id = identity();
+	static const auto id = identity();
 	return id;
 }
 

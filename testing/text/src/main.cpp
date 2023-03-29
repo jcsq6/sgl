@@ -130,18 +130,21 @@ int main()
 		if (cam_changed)
 			view = cam.view();
 
-		text.set_angle(text.get_angle() + sgl::pi() * (float)dt.seconds());
+		text.set_angle(text.get_angle() + sgl::pi<float>() * (float)dt.seconds());
+		fps.set_string(std::to_string((int)(1 / dt.seconds())));
 
 		window.clear({ 1, 1, 1, 1 });
 
 		sgl::set_projection(&persp);
 		sgl::set_view(&view);
 
-		sgl::set_draw_color({ 0, 0, 0, .2 });
 		draw_grid(window, { -10, -10 }, { 10, 10 }, 1);
 
-		sgl::set_draw_color({ 0, 0, 0, 1 });
 		window.draw(text);
+
+		sgl::set_projection(&ortho);
+		sgl::set_view(nullptr);
+		window.draw(fps);
 
 		window.swap_buffers();
 
@@ -154,12 +157,12 @@ void draw_grid(sgl::render_target &target, sgl::vec2 min, sgl::vec2 max, float g
 	for (float x = min.x; x <= max.x; x += grid_size)
 	{
 		sgl::line_obj<false, false> line(sgl::vec3(x, 0, min.y), sgl::vec3(x, 0, max.y));
-		target.draw(line);
+		target.draw(line, { sgl::vec4(0, 0, 0, .2) });
 	}
 
 	for (float y = min.y; y <= max.y; y += grid_size)
 	{
 		sgl::line_obj<false, false> line(sgl::vec3(min.x, 0, y), sgl::vec3(max.x, 0, y));
-		target.draw(line);
+		target.draw(line, { sgl::vec4(0, 0, 0, .2) });
 	}
 }

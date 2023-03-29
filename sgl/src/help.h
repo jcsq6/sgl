@@ -6,9 +6,7 @@
 
 SGL_BEG
 DETAIL_BEG
-void setup_shader(const gtexture &text, const mat4 &m, render_shader &program);
-
-void setup_shader(const mat4 &m, render_shader &program);
+void setup_shader(render_shader &program, const mat4 &m, const lighting_engine *engine, const gtexture *text, vec4 color);
 
 const mat4 &identity_ref();
 

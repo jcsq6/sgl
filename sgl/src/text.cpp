@@ -243,7 +243,24 @@ namespace text_detail
 
 			glDisable(GL_CULL_FACE);
 
-			detail::setup_shader(*m_texture, base_transformable_obj::model, text_detail::get_shader());
+			detail::setup_shader(text_detail::get_shader(), base_transformable_obj::model, nullptr, m_texture, {0, 0, 0, 1});
+
+			render_obj::type->draw(target);
+		}
+
+		void draw(render_target &target, const render_settings &settings) const override
+		{
+			base_transformable_obj::update_model();
+
+			detail::cull_face_lock clock;
+			detail::shader_lock slock;
+
+			rectangle_obj<true>::setup_buffer();
+
+			glDisable(GL_CULL_FACE);
+		
+			render_shader &shader = settings.shader ? *settings.shader : text_detail::get_shader();
+			detail::setup_shader(shader, base_transformable_obj::model, settings.engine, m_texture, { 0, 0, 0, 1 });
 
 			render_obj::type->draw(target);
 		}
@@ -252,7 +269,7 @@ namespace text_detail
 	};
 }
 
-void text::draw(render_target &target) const
+void text::draw(render_target &target, const render_settings &settings) const
 {
 	detail::blend_lock lock;
 
@@ -283,10 +300,15 @@ void text::draw(render_target &target) const
 		cspr.set_rot_origin(m_rot_origin - cur_loc);
 		cspr.set_rot_axis(m_axis);
 
-		cspr.draw(target);
+		cspr.draw(target, settings);
 	}
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+}
+
+void text::draw(render_target &target) const
+{
+	draw(target, {});
 }
 
 rect text::get_local_rect() const

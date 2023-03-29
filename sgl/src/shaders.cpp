@@ -1,4 +1,5 @@
 #include "shaders/shaders.h"
+#include "shaders/lighting.h"
 #include "context_lock/context_lock.h"
 #include "utils/error.h"
 #include <GL/glew.h>
@@ -208,7 +209,7 @@ void shader::set_uniform(const std::string &name, const gtexture &val)
 	textures[get_loc(name)] = &val;
 }
 
-void shader::bind() const
+void shader::bind()
 {
 	glUseProgram(id);
 
@@ -233,6 +234,176 @@ void shader::destroy()
 int shader::get_loc(const std::string &name)
 {
 	return glGetUniformLocation(id, name.c_str());
+}
+
+void material::send(shader &program, const std::string &name) const
+{
+	detail::shader_lock context;
+
+	glUseProgram(program.index());
+
+	std::string member = name + ".ambient";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(ambient));
+
+	member = name;
+	member += ".diffuse";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(diffuse));
+
+	member = name;
+	member += ".specular";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(specular));
+
+	member = name;
+	member += ".shininess";
+	glUniform1f(glGetUniformLocation(program.index(), member.c_str()), shininess);
+}
+
+void texture_material::send(shader &program, const std::string &name) const
+{
+	detail::shader_lock context;
+
+	glUseProgram(program.index());
+
+	std::string member = name + ".diffuse";
+	glUniform1i(glGetUniformLocation(program.index(), member.c_str()), diffuse);
+
+	member += ".specular";
+	glUniform1i(glGetUniformLocation(program.index(), member.c_str()), specular);
+
+	member = name;
+	member += ".shininess";
+	glUniform1f(glGetUniformLocation(program.index(), member.c_str()), shininess);
+}
+
+void global_light::send(shader &program, const std::string &name) const
+{
+	detail::shader_lock context;
+
+	glUseProgram(program.index());
+
+	std::string member = name + ".ambient";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(ambient));
+}
+
+//void basic_light::send(shader &program, const std::string &name) const
+//{
+//	detail::shader_lock context;
+//
+//	glUseProgram(program.index());
+//
+//	std::string member = name + ".ambient";
+//	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(ambient));
+//
+//	member = name;
+//	member += ".diffuse";
+//	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(diffuse));
+//
+//	member = name;
+//	member += ".specular";
+//	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(specular));
+//}
+
+void directional_light::send(shader &program, const std::string &name) const
+{
+	detail::shader_lock context;
+
+	glUseProgram(program.index());
+
+	std::string member = name + ".ambient";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(ambient));
+
+	member = name;
+	member += ".diffuse";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(diffuse));
+
+	member = name;
+	member += ".specular";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(specular));
+
+	member = name;
+	member += ".direction";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(direction));
+}
+
+void positional_light::send(shader &program, const std::string &name) const
+{
+	detail::shader_lock context;
+
+	glUseProgram(program.index());
+
+	std::string member = name + ".ambient";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(ambient));
+
+	member = name;
+	member += ".diffuse";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(diffuse));
+
+	member = name;
+	member += ".specular";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(specular));
+
+	member = name;
+	member += ".position";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(position));
+
+	member = name;
+	member += ".constant";
+	glUniform1f(glGetUniformLocation(program.index(), member.c_str()), constant);
+
+	member = name;
+	member += ".linear";
+	glUniform1f(glGetUniformLocation(program.index(), member.c_str()), linear);
+
+	member = name;
+	member += ".quadratic";
+	glUniform1f(glGetUniformLocation(program.index(), member.c_str()), quadratic);
+}
+
+void spotlight::send(shader &program, const std::string &name) const
+{
+	detail::shader_lock context;
+
+	glUseProgram(program.index());
+
+	std::string member = name + ".ambient";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(ambient));
+
+	member = name;
+	member += ".diffuse";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(diffuse));
+
+	member = name;
+	member += ".specular";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(specular));
+
+	member = name;
+	member += ".direction";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(direction));
+
+	member = name;
+	member += ".position";
+	glUniform3fv(glGetUniformLocation(program.index(), member.c_str()), 1, value(position));
+
+	member = name;
+	member += ".cutoff_angle";
+	glUniform1f(glGetUniformLocation(program.index(), member.c_str()), cutoff_angle);
+
+
+	member = name;
+	member += ".outer_cutoff_angle";
+	glUniform1f(glGetUniformLocation(program.index(), member.c_str()), outer_cutoff_angle);
+
+	member = name;
+	member += ".constant";
+	glUniform1f(glGetUniformLocation(program.index(), member.c_str()), constant);
+
+	member = name;
+	member += ".linear";
+	glUniform1f(glGetUniformLocation(program.index(), member.c_str()), linear);
+
+	member = name;
+	member += ".quadratic";
+	glUniform1f(glGetUniformLocation(program.index(), member.c_str()), quadratic);
 }
 
 SGL_END

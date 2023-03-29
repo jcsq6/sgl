@@ -36,8 +36,8 @@ int main()
 
 	sgl::rectangle_obj rect({ 3, 2, 0 }, { 2, 1 }, { 0, 0, 1 });
 
-	sgl::point_obj<2> pt_2d({ 0, 3 }, .1);
-	sgl::point_obj<3> pt_3d({ 0, 4, 0 }, .1);
+	sgl::point_obj<2> pt_2d({ 0, 3 }, .1f);
+	sgl::point_obj<3> pt_3d({ 0, 4, 0 }, .1f);
 
 	sgl::line_obj<false, false> line({ 0, 0, 4 }, { 2, 4, 0 });
 
@@ -119,26 +119,16 @@ int main()
 		if (cam_changed)
 			view = cam.view();
 
-		cube.set_angle(cube.get_angle() + (float)dt.seconds() * sgl::pi());
+		cube.set_angle(cube.get_angle() + (float)dt.seconds() * sgl::pi<float>());
 
 		window.clear({ 1, 1, 1, 1 });
 
-		sgl::set_draw_color({ 0, 0, 0, .2 });
 		draw_grid(window, { -10, -10 }, { 10, 10 }, 1);
 
-		sgl::set_draw_color({ 1, 0, 0, 1 });
-		window.draw(cube);
-
-		sgl::set_draw_color({ 0, 1, 0, 1 });
-		window.draw(rect);
-
-		sgl::set_draw_color({ 1, 1, 0, 1 });
-		window.draw(pt_2d);
-
-		sgl::set_draw_color({ 1, 0, 1, 1 });
-		window.draw(pt_3d);
-
-		sgl::set_draw_color({ 0, 0, 0, 1 });
+		window.draw(cube, {sgl::vec4(1, 0, 0, 1)});
+		window.draw(rect, {sgl::vec4(0, 1, 0, 1)});
+		window.draw(pt_2d, { sgl::vec4(1, 1, 0, 1) });
+		window.draw(pt_3d, { sgl::vec4(0, 1, 1, 1) });
 		window.draw(line);
 
 		window.swap_buffers();
@@ -152,12 +142,12 @@ void draw_grid(sgl::render_target &target, sgl::vec2 min, sgl::vec2 max, float g
 	for (float x = min.x; x <= max.x; x += grid_size)
 	{
 		sgl::line_obj<false, false> line(sgl::vec3(x, 0, min.y), sgl::vec3(x, 0, max.y));
-		target.draw(line);
+		target.draw(line, { sgl::vec4(0, 0, 0, .2) });
 	}
 
 	for (float y = min.y; y <= max.y; y += grid_size)
 	{
 		sgl::line_obj<false, false> line(sgl::vec3(min.x, 0, y), sgl::vec3(max.x, 0, y));
-		target.draw(line);
+		target.draw(line, { sgl::vec4(0, 0, 0, .2) });
 	}
 }

@@ -14,6 +14,7 @@ public:
 	cube_obj(vec3 min, vec3 size);
 
 	void draw(render_target& target) const override;
+	void draw(render_target &target, const render_settings &settings) const override;
 };
 
 template <bool rotatable = false>
@@ -39,6 +40,7 @@ public:
 	inline vec2 get_size() const { return m_sz; }
 
 	void draw(render_target& target) const override;
+	void draw(render_target &target, const render_settings &settings) const override;
 protected:
 	vec3 m_right;
 	vec3 m_up;
@@ -63,6 +65,7 @@ public:
 	inline vec<float, dim> get_center() const { return m_center; }
 
 	void draw(render_target& target) const override;
+	void draw(render_target &target, const render_settings &settings) const override;
 protected:
 	vec<float, dim> m_center;
 	float m_size;
@@ -86,6 +89,7 @@ public:
 	inline float get_line_width() const { return m_width; }
 
 	void draw(render_target& target) const override;
+	void draw(render_target &target, const render_settings &settings) const override;
 
 protected:
 	vec3 m_end;

@@ -233,7 +233,8 @@ public:
 	/// @return bound including min of 3d text bounds, and dimensions
 	bound get_local_bound() const;
 
-	void draw(render_target& target) const override;
+	void draw(render_target &target, const render_settings &settings) const override;
+	void draw(render_target &target) const override;
 
 private:
 	std::basic_string<uint32_t> m_data;

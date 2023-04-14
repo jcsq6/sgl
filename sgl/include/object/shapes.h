@@ -92,10 +92,10 @@ public:
 	void draw(render_target &target, const render_settings &settings) const override;
 
 protected:
+	void apply_transform() const override;
+
 	vec3 m_end;
 	float m_width;
-
-	void setup_buffer() const;
 };
 
 // class polygon_obj : public movable_obj, public rotatable_obj, public colorable_obj

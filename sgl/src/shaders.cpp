@@ -204,7 +204,7 @@ void shader::set_uniform(const std::string &name, const mat4 &val)
 	glUniformMatrix4fv(get_loc(name), 1, GL_FALSE, value(val));
 }
 
-void shader::set_uniform(const std::string &name, const gtexture &val)
+void shader::set_uniform(const std::string &name, const texture &val)
 {
 	textures[get_loc(name)] = &val;
 }
@@ -220,7 +220,7 @@ void shader::bind()
 		// send uniform location
 		glUniform1i(it->first, i);
 		// activate texture
-		gtexture::activate_unit(i);
+		texture::activate_unit(i);
 		// bind corresponding texture
 		it->second->use();
 	}
@@ -265,10 +265,11 @@ void texture_material::send(shader &program, const std::string &name) const
 	glUseProgram(program.index());
 
 	std::string member = name + ".diffuse";
-	glUniform1i(glGetUniformLocation(program.index(), member.c_str()), diffuse);
-
+	program.set_uniform(member, *diffuse);
+	
+	member = name;
 	member += ".specular";
-	glUniform1i(glGetUniformLocation(program.index(), member.c_str()), specular);
+	program.set_uniform(member, *specular);
 
 	member = name;
 	member += ".shininess";

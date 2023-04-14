@@ -6,7 +6,7 @@
 SGL_BEG
 DETAIL_BEG
 
-void setup_shader(render_shader &program, const mat4 &m, const lighting_engine *engine, const gtexture *text, vec4 color)
+void setup_shader(render_shader &program, const mat4 &m, const lighting_engine *engine, const texture *text, const abstract_material *mat, vec4 color)
 {
 	if (program.has_texture_uniform() && text)
 		program.set_texture_uniform(*text);
@@ -17,6 +17,16 @@ void setup_shader(render_shader &program, const mat4 &m, const lighting_engine *
 	if (program.has_color_uniform())
 		program.set_color_uniform(color);
 
+	if (mat)
+	{
+		auto material_base = dynamic_cast<const material *>(mat);
+		if (material_base && program.has_material_uniform())
+			program.set_material_uniform(*material_base);
+		auto text_material_base = dynamic_cast<const texture_material *>(mat);
+		if (text_material_base && program.has_textureMaterial_uniform())
+			program.set_textureMaterial_uniform(*text_material_base);
+	}
+
 	auto *v = get_view();
 	auto *p = get_projection();
 
@@ -25,11 +35,13 @@ void setup_shader(render_shader &program, const mat4 &m, const lighting_engine *
 	if (!v)
 		v = &detail::identity_ref();
 
-	if (program.has_modelViewProj_uniform() || program.has_modelView_uniform())
+	if (program.has_modelViewProj_uniform() || program.has_modelView_uniform() || program.has_inverseModelView_uniform())
 	{
 		mat4 mv = *v;
 		mv *= m;
 
+		if (program.has_inverseModelView_uniform())
+			program.set_inverseModelView_uniform(inverse(mv));
 		if (program.has_modelView_uniform())
 			program.set_modelView_uniform(mv);
 		if (program.has_modelViewProj_uniform())
@@ -66,6 +78,25 @@ vbo &rect_obj_vbo()
 	return res;
 }
 
+vbo &rect_norm_vbo()
+{
+	static vbo res = make_rect_vbo();
+	return res;
+}
+
+const vbo &rect_textPos_vbo()
+{
+	// assumes that the other vbo's follow this convection: min, right, max, up
+	static shape_data_array<4, 2> text_coords{ {
+		{0, 0},
+		{1, 0},
+		{1, 1},
+		{0, 1},
+	}};
+	static vbo buffer = text_coords.get_buffer();
+	return buffer;
+}
+
 // const vbo& rect_data_2d()
 // {
 // 	static shape_data_array<4, 2> rect = {
@@ -79,10 +110,8 @@ vbo &rect_obj_vbo()
 // 	return res;
 // }
 
-const shape_data_array<3 * 12, 2> &cube_texture_coords()
+const vbo &cube_texture_coords()
 {
-	using namespace sgl;
-
 	static shape_data_array<3 * 12, 2> text_coords{ {
 			// FRONT FACE
 			{0, 0}, {1, 0}, {0, 1},
@@ -109,13 +138,13 @@ const shape_data_array<3 * 12, 2> &cube_texture_coords()
 			{0, 1}, {1, 0}, {1, 1},
 		} };
 
-	return text_coords;
+	static vbo buffer = text_coords.get_buffer();
+
+	return buffer;
 }
 
-const shape_data_array<3 * 12, 3> &cube_norms()
+const vbo &cube_norms()
 {
-	using namespace sgl;
-
 	constexpr vec3 A(1, 0, 0);
 	constexpr vec3 B(0, 0, 0);
 	constexpr vec3 C(0, 0, 1);
@@ -158,13 +187,13 @@ const shape_data_array<3 * 12, 3> &cube_norms()
 			right_norm, right_norm, right_norm,
 		} };
 
-	return norms;
+	static vbo buffer = norms.get_buffer();
+
+	return buffer;
 }
 
-const shape_data_array<3 * 12, 3> &cube_pts()
+const vbo &cube_pts()
 {
-	using namespace sgl;
-
 	constexpr vec3 A(1, 0, 0);
 	constexpr vec3 B(0, 0, 0);
 	constexpr vec3 C(0, 0, 1);
@@ -200,7 +229,9 @@ const shape_data_array<3 * 12, 3> &cube_pts()
 			F, C, G,
 		} };
 
-	return pts;
+	static vbo buffer = pts.get_buffer();
+
+	return buffer;
 }
 DETAIL_END
 SGL_END

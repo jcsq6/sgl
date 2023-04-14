@@ -1,6 +1,6 @@
 #pragma once
 #include "macro.h"
-#include "object/gtexture.h"
+#include "object/texture.h"
 #include "math/mat.h"
 
 #include <string>
@@ -67,7 +67,7 @@ public:
 	void set_uniform(const std::string &name, const mat3 &val);
 	void set_uniform(const std::string &name, const mat4 &val);
 
-	void set_uniform(const std::string &name, const gtexture &val);
+	void set_uniform(const std::string &name, const texture &val);
 
 	inline void set_uniform(const std::string &name, const uniform_type &val)
 	{
@@ -81,7 +81,7 @@ public:
 private:
 	unsigned int id;
 
-	std::map<int, const gtexture *> textures;
+	std::map<int, const texture *> textures;
 
 	void destroy();
 	int get_loc(const std::string &name);

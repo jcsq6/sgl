@@ -7,7 +7,7 @@
 #include <GL/glew.h>
 
 SGL_BEG
-class gtexture : public gl_object
+class texture : public gl_object
 {
 	GLuint id;
 	int width;
@@ -15,28 +15,28 @@ class gtexture : public gl_object
 	int nr_channels;
 
 public:
-	inline gtexture() : id{}, width{}, height{}, nr_channels{} {}
-	inline ~gtexture()
+	inline texture() : id{}, width{}, height{}, nr_channels{} {}
+	inline ~texture()
 	{
 		destroy();
 	}
 
-	inline gtexture(const std::string &file_name, GLenum target_format) : id{}
+	inline texture(const std::string &file_name, GLenum target_format) : id{}
 	{
 		load(file_name, target_format);
 	}
 
-	inline gtexture(GLenum target_format, const void *data, GLsizei width, GLsizei height, int channel_count, bool flip = true) : id{}
+	inline texture(GLenum target_format, const void *data, GLsizei width, GLsizei height, int channel_count, bool flip = true) : id{}
 	{
 		load(target_format, data, width, height, channel_count, flip);
 	}
 
-	inline gtexture(gtexture &&other) noexcept : id{other.id}, width{other.width}, height{other.height}, nr_channels{other.nr_channels}
+	inline texture(texture &&other) noexcept : id{other.id}, width{other.width}, height{other.height}, nr_channels{other.nr_channels}
 	{
 		other.id = other.width = other.height = other.nr_channels = 0;
 	}
 
-	inline gtexture &operator=(gtexture &&other) noexcept
+	inline texture &operator=(texture &&other) noexcept
 	{
 		destroy();
 		id = other.id;

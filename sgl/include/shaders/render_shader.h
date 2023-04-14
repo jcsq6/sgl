@@ -20,12 +20,14 @@ namespace variables
 		sgl_ModelView = sgl_Proj << 1,
 		// uniform for proj * view * model matrix
 		sgl_ModelViewProj = sgl_ModelView << 1,
+		// uniform for the inverse of the model view matrix
+		sgl_InverseModelView = sgl_ModelViewProj << 1,
 		// uniform for texture 
-		sgl_Texture = sgl_ModelViewProj << 1,
+		sgl_Texture = sgl_InverseModelView << 1,
 
 		// uniform for material
 		// material type has the following form:
-		// struct material
+		// struct sgl_Material_t
 		// {
 		//	 vec3 ambient;
 		//	 vec3 diffuse;
@@ -36,7 +38,7 @@ namespace variables
 
 		// uniform for texture material
 		// texture material type has the following form:
-		// struct texture_material
+		// struct sgl_TextureMaterial_t
 		// {
 		//   sampler2D diffuse;
 		//	 sampler2D specular;
@@ -46,7 +48,7 @@ namespace variables
 
 		// uniform for global light
 		// global light type has the following form:
-		// struct global_light
+		// struct sgl_GlobalLight_t
 		// {
 		//   vec3 ambient;
 		// };
@@ -55,7 +57,7 @@ namespace variables
 		// uniform for array of directional lights
 		// array size is stored in uniform int sgl_DirectionalLightsSize
 		// directional light type has the following form:
-		// struct directional_light
+		// struct sgl_DirectionalLight_t
 		// {
 		//   vec3 ambient;
 		//   vec3 diffuse;
@@ -67,7 +69,7 @@ namespace variables
 		// uniform for array of positional lights
 		// array size is stored in uniform int sgl_PostionalLightsSize
 		// positional light type has the following form:
-		// struct positional_light
+		// struct sgl_PositionalLight_t
 		// {
 		//   vec3 ambient;
 		//	 vec3 diffuse;
@@ -82,7 +84,7 @@ namespace variables
 		// uniform for array of spotlights
 		// array size is stored in uniform int sgl_SpotlightsSize
 		// sptlight type has the following form:
-		// struct spotlight
+		// struct sgl_Spotlight_t
 		// {
 		//	 vec3 ambient;
 		//	 vec3 diffuse;
@@ -117,15 +119,15 @@ namespace variables
 
 /// <summary>
 /// Standardized shader program class with standard variables
-/// All variables that have been set to be included will be fulfilled by drawing operations
-/// TODO: add ModelView uniform
 /// OPTIONAL VARIABLES
 /// Standardized uniforms
 ///		vec4 sgl_Color; // contains a constant color
 ///		mat4 sgl_View; // contains the view matrix
 ///		mat4 sgl_Model; // contains the model matrix
 ///		mat4 sgl_Proj; // contains the projection matrix
+///		mat4 sgl_ModelView; // containts the model-view matrix
 ///		mat4 sgl_ModelViewProj; // contains the model-view-projection matrix
+///		mat4 sgl_InverseModelView; // contains the inverse of the model view matrix
 ///		sampler2D sgl_Texture; // contains the texture index
 ///		sgl_Material_t sgl_Material; // contains the material
 ///		sgl_TextureMaterial_t sgl_TextureMaterial; // contains the texture material
@@ -176,13 +178,13 @@ public:
 	/// <param name="fragment">Fragment shader code including main function. Uniforms, version, and in/out variables should not be included</param>
 	/// <param name="num_directional">Number of directional lights to be used</param>
 	/// <param name="num_positional">Number of positional lights to be used</param>
-	/// <param name="num_sptlights">Number of spotlights to be used</param>
+	/// <param name="num_spotlights">Number of spotlights to be used</param>
 	/// <param name="variables">Bit mask of all variables to be included. Fields are defined in variables::variable_type</param>
-	inline render_shader(const std::string &vertex, const std::string &fragment, unsigned int num_directional, unsigned int num_positional, unsigned int num_sptlights, unsigned int variables) : render_shader()
+	inline render_shader(const std::string &vertex, const std::string &fragment, unsigned int num_directional, unsigned int num_positional, unsigned int num_spotlights, unsigned int variables) : render_shader()
 	{
 		set_num_directionalLights(num_directional);
 		set_num_positionalLights(num_positional);
-		set_num_spotlights(num_sptlights);
+		set_num_spotlights(num_spotlights);
 		generate_shader(vertex, fragment, variables);
 	}
 
@@ -241,7 +243,8 @@ public:
 	inline void set_proj_uniform(const mat4 &proj) { m_shader.set_uniform("sgl_Proj", proj); }
 	inline void set_modelView_uniform(const mat4 &modelView) { m_shader.set_uniform("sgl_ModelView", modelView); }
 	inline void set_modelViewProj_uniform(const mat4 &modelViewProj) { m_shader.set_uniform("sgl_ModelViewProj", modelViewProj); }
-	inline void set_texture_uniform(const gtexture &texture) { m_shader.set_uniform("sgl_Texture", texture); }
+	inline void set_inverseModelView_uniform(const mat4 &inverseModelView) { m_shader.set_uniform("sgl_InverseModelView", inverseModelView); }
+	inline void set_texture_uniform(const texture &texture) { m_shader.set_uniform("sgl_Texture", texture); }
 
 	inline void set_material_uniform(const material &mat) { m_shader.set_uniform("sgl_Material", mat); }
 	inline void set_textureMaterial_uniform(const texture_material &mat) { m_shader.set_uniform("sgl_TextureMaterial", mat); }
@@ -257,6 +260,7 @@ public:
 	inline bool has_proj_uniform() const { return m_variables & variables::sgl_Proj; }
 	inline bool has_modelView_uniform() const { return m_variables & variables::sgl_ModelView; }
 	inline bool has_modelViewProj_uniform() const { return m_variables & variables::sgl_ModelViewProj; }
+	inline bool has_inverseModelView_uniform() const { return m_variables & variables::sgl_InverseModelView; }
 	inline bool has_texture_uniform() const { return m_variables & variables::sgl_Texture; }
 	inline bool has_material_uniform() const { return m_variables & variables::sgl_Material; }
 	inline bool has_textureMaterial_uniform() const { return m_variables & variables::sgl_TextureMaterial; }
@@ -335,4 +339,7 @@ private:
 	std::vector<std::string> m_spotlights;
 	unsigned int m_variables;
 };
+
+render_shader phong_shader(unsigned int num_directional, unsigned int num_positional, unsigned int num_spotlights, unsigned int variables);
+
 SGL_END

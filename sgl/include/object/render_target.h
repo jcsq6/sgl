@@ -1,7 +1,7 @@
 #pragma once
 #include "math/mat.h"
 #include "buffers.h"
-#include "gtexture.h"
+#include "texture.h"
 
 SGL_BEG
 
@@ -78,7 +78,7 @@ class texture_target : public render_target
 {
 public:
 	inline texture_target() : framebuffer{}, text{} {}
-	inline texture_target(gtexture &texture) : framebuffer{}, text{&texture}
+	inline texture_target(texture &texture) : framebuffer{}, text{&texture}
 	{
 		framebuffer.generate();
 		framebuffer.attach_data(texture, GL_COLOR_ATTACHMENT0);
@@ -86,7 +86,7 @@ public:
 		set_logical_viewport();
 	}
 
-	inline void attach_texture(gtexture &texture)
+	inline void attach_texture(texture &texture)
 	{
 		text = &texture;
 		if (!framebuffer.index())
@@ -101,7 +101,7 @@ public:
 
 private:
 	fbo framebuffer;
-	gtexture *text;
+	texture *text;
 
 	void bind_framebuffer() override;
 };

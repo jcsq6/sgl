@@ -2,7 +2,7 @@
 #include "render_obj.h"
 #include "math/vec.h"
 #include "math/bound.h"
-#include "gtexture.h"
+#include "texture.h"
 
 #include <string>
 #include <map>
@@ -74,7 +74,7 @@ private:
 
 		void load(const font *_font, uint32_t c);
 
-		gtexture text;
+		texture text;
 
 		ivec2 offset;
 		unsigned int advance;

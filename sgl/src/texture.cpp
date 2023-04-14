@@ -1,4 +1,4 @@
-#include "object/gtexture.h"
+#include "object/texture.h"
 #include "math/vec.h"
 #include "utils/error.h"
 
@@ -20,7 +20,7 @@ void set_defaults()
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, value(border_col));
 }
 
-void gtexture::load(const std::string &file_name, GLenum target_format)
+void texture::load(const std::string &file_name, GLenum target_format)
 {
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char *data = stbi_load(file_name.data(), &width, &height, &nr_channels, 0);
@@ -85,7 +85,7 @@ void gtexture::load(const std::string &file_name, GLenum target_format)
 	stbi_image_free(data);
 }
 
-void gtexture::load(GLenum target_format, const void *data, GLsizei width, GLsizei height, int channel_count, bool flip)
+void texture::load(GLenum target_format, const void *data, GLsizei width, GLsizei height, int channel_count, bool flip)
 {
 	this->width = width;
 	this->height = height;
@@ -161,7 +161,7 @@ void gtexture::load(GLenum target_format, const void *data, GLsizei width, GLsiz
 		delete[] reinterpret_cast<const unsigned char *>(data);
 }
 
-void gtexture::reserve(GLenum target_format, GLsizei width, GLsizei height)
+void texture::reserve(GLenum target_format, GLsizei width, GLsizei height)
 {
 	this->width = width;
 	this->height = height;

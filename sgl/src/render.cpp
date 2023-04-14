@@ -80,7 +80,7 @@ void render_obj::bind_target(render_target &target) const
 
 void render_obj::draw(render_target &target) const
 {
-	render_settings settings{ vec4{0, 0, 0, 1}, nullptr, nullptr };
+	render_settings settings( vec4{0, 0, 0, 1}, nullptr, nullptr, nullptr );
 	draw(target, settings);
 }
 

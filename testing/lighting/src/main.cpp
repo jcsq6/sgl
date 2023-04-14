@@ -1,7 +1,11 @@
 #include <sgl.h>
+#include <object/shapes.h>
 #include <object/camera.h>
+#include <shaders/render_shader.h>
 #include <utils/timer.h>
-#include <object/sprite.h>
+#include <utils/error.h>
+
+#include <iostream>
 
 #ifdef _WIN32
 #define main WinMain
@@ -11,7 +15,7 @@ void draw_grid(sgl::render_target &target, sgl::vec2 min, sgl::vec2 max, float g
 
 int main()
 {
-	sgl::window window(500, 500, "sprite");
+	sgl::window window(500, 500, "work");
 	window.set_logical_size(500, 500);
 	window.set_swap_interval(1);
 
@@ -19,6 +23,7 @@ int main()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 
 	sgl::mat4 persp = sgl::perspective<float>(45.f, 1, 0.1f, 1000);
 	sgl::set_projection(&persp);
@@ -28,9 +33,23 @@ int main()
 	sgl::mat4 view = cam.view();
 	sgl::set_view(&view);
 
-	sgl::texture texture("image.png", GL_RGBA);
-	sgl::sprite<true> sprite(texture, {}, {2, 1});
-	sprite.set_rot_axis({ 0,1,0 });
+	sgl::cube_obj<false> cube({}, { 5, 5, 2 });
+	//sgl::rectangle_obj<false> rect({}, { 2, 2 });
+
+	auto lighting_shader = sgl::phong_shader(0, 0, 1, sgl::variables::sgl_TextureMaterial);
+	
+	sgl::lighting_engine engine;
+	//engine.add_positional_light(sgl::positional_light(indigo, purple, light_purple, { 3, 1, 0 }, .4f, 0.f, .07f));
+	//engine.add_directional_light(sgl::directional_light({ 1, 1, 1 }, { 1, 1, 1 }, {.75, .75, .75}, {-1, -1, 0}));
+	engine.add_spotlight(sgl::spotlight({ 1, 1, 1 }, { 1, 1, 1 }, { .75, .75, .75 }, cam.get_dir(), cam.pos, sgl::radians(10.f), sgl::radians(40.f), 1, 0.09f, 0.032f));
+	auto spotlight = engine.spotlights_end() - 1;
+	//auto light = engine.positional_lights_end() - 1;
+	//sgl::cube_obj<false> light_cube(light->position, { .1, .1, .1 });
+
+	sgl::texture diffuse_text("shield_diffuse.png", GL_RGBA);
+	sgl::texture specular_text("shield_specular.png", GL_RGBA);
+	sgl::texture_material material(diffuse_text, specular_text, 16);
+	//sgl::material material({ 1, .5, .31 }, { 1, .5, .31 }, { .5, .5, .5 }, 512);
 
 	auto cursor_callback = [&cam_changed, &cam, &window](double x, double y)
 	{
@@ -53,9 +72,10 @@ int main()
 
 	window.set_cursor_callback(cursor_callback);
 
-	auto framebuffer_callback = [&persp](int width, int height)
+	auto framebuffer_callback = [&persp/*, &ortho */](int width, int height)
 	{
 		persp = sgl::perspective<float>(45.f, (float)width / height, 0.1f, 100);
+		//ortho = sgl::ortho_mat(0, width, 0, height, -1, 1);
 	};
 
 	window.set_framebuffer_callback(framebuffer_callback);
@@ -107,17 +127,41 @@ int main()
 		}
 
 		if (cam_changed)
+		{
 			view = cam.view();
+			spotlight->position = cam.pos;
+			spotlight->direction = -cam.get_dir();
+		}
 
-		sprite.set_angle(sprite.get_angle() + sgl::pi<float>() * (float)dt.seconds());
+		//light->position = sgl::vec3(sgl::rot(dt.seconds() * sgl::pi() / 2, { 0, 1, 0 }) * sgl::vec4(light->position, 1));
+		//light_cube.set_loc(light->position);
 
-		window.clear({ 1, 1, 1, 1 });
+		window.clear({ 184.f / 255 , 184.f / 255, 184.f / 255, 1 });
 
-		draw_grid(window, { -10, -10 }, { 10, 10 }, 1);
+		//draw_grid(window, { -10, -10 }, { 10, 10 }, 1);
 
-		window.draw(sprite);
+		sgl::render_settings settings({1, 1, 1, 1}, &lighting_shader, &engine, &material);
+		window.draw(cube, settings);
+		
+		/*for (int x = 0; x < 5; ++x)
+		{
+			for (int y = 0; y < 5; ++y)
+			{
+				cube.set_loc({ x, y, 0 });
+				window.draw(cube, settings);
+			}
+		}*/
+		//window.draw(light_cube, { sgl::vec4(purple, 1.0) });
 
 		window.swap_buffers();
+
+		sgl::error err;
+		while (sgl::get_error(err))
+		{
+			std::ofstream out("error.txt", std::ofstream::app);
+			out << err.message() << '\n';
+			out << '\n';
+		}
 
 		dt.stop();
 	}
@@ -128,7 +172,7 @@ void draw_grid(sgl::render_target &target, sgl::vec2 min, sgl::vec2 max, float g
 	for (float x = min.x; x <= max.x; x += grid_size)
 	{
 		sgl::line_obj<false, false> line(sgl::vec3(x, 0, min.y), sgl::vec3(x, 0, max.y));
-		target.draw(line, {sgl::vec4(0, 0, 0, .2)});
+		target.draw(line, { sgl::vec4(0, 0, 0, .2) });
 	}
 
 	for (float y = min.y; y <= max.y; y += grid_size)

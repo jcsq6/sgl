@@ -11,18 +11,22 @@ class render_obj;
 class render_shader;
 class lighting_engine;
 
+struct abstract_material;
+
 struct render_settings
 {
-	inline render_settings() : color{ 0, 0, 0, 1 }, shader{}, engine{} {}
-	inline render_settings(vec4 col) : color{ col }, shader{}, engine{} {}
-	inline render_settings(render_shader *shader_program) : color{ 0, 0, 0, 1 }, shader{ shader_program }, engine{} {}
-	inline render_settings(const lighting_engine *light_engine) : color{ 0, 0, 0, 1 }, shader{}, engine{ light_engine } {}
-	inline render_settings(render_shader *shader_program, const lighting_engine *light_engine) : color{ 0, 0, 0, 1 }, shader{ shader_program }, engine{ light_engine } {}
-	inline render_settings(vec4 col, render_shader *shader_program, const lighting_engine *light_engine) : color{ col }, shader{ shader_program }, engine{ light_engine } {}
+	inline render_settings() : color{ 0, 0, 0, 1 }, shader{}, engine{}, material{} {}
+	
+	inline render_settings(vec4 col) : color{ col }, shader{}, engine{}, material{} {}
+	inline render_settings(render_shader *shader_program) : color{ 0, 0, 0, 1 }, shader{ shader_program }, engine{}, material{} {}
+	inline render_settings(const lighting_engine *light_engine) : color{ 0, 0, 0, 1 }, shader{}, engine{ light_engine }, material{} {}
+	inline render_settings(const abstract_material *obj_material) : color{ 0, 0, 0, 1 }, shader{}, engine{}, material{obj_material} {}
+	inline render_settings(vec4 col, render_shader *shader_program, const lighting_engine *light_engine, const abstract_material *obj_material) : color{ col }, shader{ shader_program }, engine{ light_engine }, material{ obj_material } {}
 	
 	vec4 color;
 	render_shader *shader;
 	const lighting_engine *engine;
+	const abstract_material *material;
 };
 
 // render_types are generic types for rendering

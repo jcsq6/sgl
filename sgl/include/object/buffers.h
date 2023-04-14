@@ -1,7 +1,7 @@
 #pragma once
 #include "context_lock/context_lock.h"
 #include "gl_object.h"
-#include "gtexture.h"
+#include "texture.h"
 
 SGL_BEG
 
@@ -300,7 +300,7 @@ public:
 		return id;
 	}
 
-	inline void attach_data(const gtexture &text, GLenum type) const
+	inline void attach_data(const texture &text, GLenum type) const
 	{
 		detail::fbo_lock lock;
 		use();
@@ -545,7 +545,7 @@ public:
 		return id.index();
 	}
 
-	inline void attach_data(const gtexture &text, GLenum type) const
+	inline void attach_data(const texture &text, GLenum type) const
 	{
 		id.attach_data(text, type);
 	}

@@ -243,7 +243,7 @@ namespace text_detail
 
 			glDisable(GL_CULL_FACE);
 
-			detail::setup_shader(text_detail::get_shader(), base_transformable_obj::model, nullptr, m_texture, {0, 0, 0, 1});
+			detail::setup_shader(text_detail::get_shader(), base_transformable_obj::model, nullptr, m_texture, nullptr, {0, 0, 0, 1});
 
 			render_obj::type->draw(target);
 		}
@@ -260,12 +260,12 @@ namespace text_detail
 			glDisable(GL_CULL_FACE);
 		
 			render_shader &shader = settings.shader ? *settings.shader : text_detail::get_shader();
-			detail::setup_shader(shader, base_transformable_obj::model, settings.engine, m_texture, { 0, 0, 0, 1 });
+			detail::setup_shader(shader, base_transformable_obj::model, settings.engine, m_texture, settings.material, { 0, 0, 0, 1 });
 
 			render_obj::type->draw(target);
 		}
 
-		const gtexture* m_texture;
+		const texture* m_texture;
 	};
 }
 

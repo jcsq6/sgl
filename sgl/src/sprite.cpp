@@ -75,7 +75,7 @@ public:
 };
 
 template <bool rotatable>
-sprite<rotatable>::sprite(const gtexture &texture, vec3 min, vec2 size, vec3 right, vec3 up) : render_obj(sprite_type::get_instance()),
+sprite<rotatable>::sprite(const texture &texture, vec3 min, vec2 size, vec3 right, vec3 up) : render_obj(sprite_type::get_instance()),
 																							   movable_obj(min),
 																							   rectangle_obj<rotatable>::rectangle_obj(min, size, right, up),
 																							   m_texture(&texture)
@@ -91,7 +91,7 @@ void sprite<rotatable>::draw(render_target &target) const
 
 	rectangle_obj<rotatable>::setup_buffer();
 
-	detail::setup_shader(sprite_detail::get_shader(), base_transformable_obj::model, nullptr, m_texture, {0, 0, 0, 1});
+	detail::setup_shader(sprite_detail::get_shader(), base_transformable_obj::model, nullptr, m_texture, nullptr, {0, 0, 0, 1});
 
 	render_obj::type->draw(target);
 }
@@ -106,7 +106,7 @@ void sprite<rotatable>::draw(render_target &target, const render_settings &setti
 	rectangle_obj<rotatable>::setup_buffer();
 
 	render_shader &shader = settings.shader ? *settings.shader : sprite_detail::get_shader();
-	detail::setup_shader(shader, base_transformable_obj::model, settings.engine, m_texture, { 0, 0, 0, 1 });
+	detail::setup_shader(shader, base_transformable_obj::model, settings.engine, m_texture, settings.material, { 0, 0, 0, 1 });
 
 	render_obj::type->draw(target);
 }

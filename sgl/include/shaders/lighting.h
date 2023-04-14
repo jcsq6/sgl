@@ -4,9 +4,14 @@
 
 SGL_BEG
 
+struct abstract_material : uniform_type {};
+
 // corresponding type of uniform in glsl shader must have the same member names as in this type
-struct material : uniform_type
+struct material : abstract_material
 {
+	inline material() : ambient{}, diffuse{}, specular{}, shininess{} {}
+	inline material(vec3 _ambient, vec3 _diffuse, vec3 _specular, float _shininess) : ambient{_ambient}, diffuse{_diffuse}, specular{_specular}, shininess{_shininess} {}
+	
 	// what color reflects under ambient lighting (normally the surface's color)
 	vec3 ambient;
 	// what color reflects under diffuse lighting (normally the surface's color)
@@ -19,28 +24,37 @@ struct material : uniform_type
 };
 
 // corresponding type of uniform in glsl shader must have the same member names as in this type
-struct texture_material : uniform_type
+struct texture_material : abstract_material
 {
-	using sampler2D = int;
+	using sampler2D = texture;
+
+	inline texture_material() : diffuse{}, specular{}, shininess{} {}
+	inline texture_material(const sampler2D &_diffuse, const sampler2D &_specular, float _shininess) : diffuse{ &_diffuse }, specular{ &_specular }, shininess{ _shininess } {}
+
 	// texture
-	sampler2D diffuse;
+	const sampler2D *diffuse;
 	// what color the specular highlight reflects
-	sampler2D specular;
+	const sampler2D *specular;
 	float shininess;
 
 	void send(shader &program, const std::string &name) const override;
 };
 
+struct abstract_light : uniform_type {};
+
 // corresponding type of uniform in glsl shader must have the same member names as in this type
-struct global_light : uniform_type
+struct global_light : abstract_light
 {
+	inline global_light() : ambient{} {}
+	inline global_light(vec3 _ambient) : ambient{_ambient} {}
+
 	vec3 ambient;
 
 	void send(shader &program, const std::string &name) const override;
 };
 
 //// corresponding type of uniform in glsl shader must have the same member names as in this type
-//struct basic_light : uniform_type
+//struct basic_light
 //{
 //	vec3 ambient;
 //	vec3 diffuse;
@@ -50,8 +64,11 @@ struct global_light : uniform_type
 //};
 
 // corresponding type of uniform in glsl shader must have the same member names as in this type
-struct directional_light : uniform_type
+struct directional_light : abstract_light
 {
+	inline directional_light() : ambient{}, diffuse{}, specular{}, direction{} {}
+	inline directional_light(vec3 _ambient, vec3 _diffuse, vec3 _specular, vec3 _direction) : ambient{ _ambient }, diffuse{ _diffuse }, specular{ _specular }, direction{ normalize(_direction) } {}
+
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
@@ -61,8 +78,13 @@ struct directional_light : uniform_type
 };
 
 // corresponding type of uniform in glsl shader must have the same member names as in this type
-struct positional_light : uniform_type
+struct positional_light : abstract_light
 {
+	inline positional_light() : ambient{}, diffuse{}, specular{}, position{}, constant{}, linear{}, quadratic{} {}
+	inline positional_light(vec3 _ambient, vec3 _diffuse, vec3 _specular, vec3 _position, float _constant, float _linear, float _quadratic) :
+		ambient{ _ambient }, diffuse{ _diffuse }, specular{ _specular }, position{ _position }, constant{ _constant }, linear{ _linear }, quadratic{ _quadratic }
+	{}
+
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
@@ -84,15 +106,31 @@ struct positional_light : uniform_type
 };
 
 // corresponding type of uniform in glsl shader must have the same member names as in this type
-struct spotlight : uniform_type
+struct spotlight : abstract_light
 {
+	inline spotlight() : ambient{}, diffuse{}, specular{}, direction{}, position{}, cutoff_angle{}, outer_cutoff_angle{}, constant{}, linear{}, quadratic{} {}
+	inline spotlight(vec3 _ambient, vec3 _diffuse, vec3 _specular, vec3 _direction, vec3 _position,
+					 float _cutoff_angle, float _outer_cutoff_angle, float _constant, float _linear, float _quadratic)
+		:
+		ambient{ _ambient }, diffuse{ _diffuse }, specular{ _specular }, direction{ normalize(_direction) }, position{	_position },
+		cutoff_angle{ std::cos(_cutoff_angle) }, outer_cutoff_angle{ std::cos(_outer_cutoff_angle) }, constant{ _constant }, linear{ _linear }, quadratic{ _quadratic }
+	{}
+
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
 	vec3 direction;
 	vec3 position;
+
+	inline float cos_cutoff_angle() const { return cutoff_angle; }
+	inline float cos_outer_cutoff_angle() const { return outer_cutoff_angle; }
+
+	inline void set_cutoff_angle(float _cutoff_angle) { cutoff_angle = std::cos(_cutoff_angle); }
+	inline void set_outer_cutoff_angle(float _outer_cutoff_angle) { outer_cutoff_angle = std::cos(_outer_cutoff_angle); }
+private:
 	float cutoff_angle;
 	float outer_cutoff_angle;
+public:
 	
 	// calculated with formula 1 / (constant + linear * distance + quadratic * distance * distance)
 
@@ -143,6 +181,15 @@ public:
 
 	inline auto spotlights_begin() const { return m_spotlight.begin(); }
 	inline auto spotlights_end() const { return m_spotlight.end(); }
+
+	inline auto directional_lights_begin() { return m_directional.begin(); }
+	inline auto directional_lights_end() { return m_directional.end(); }
+
+	inline auto positional_lights_begin() { return m_positional.begin(); }
+	inline auto positional_lights_end() { return m_positional.end(); }
+
+	inline auto spotlights_begin() { return m_spotlight.begin(); }
+	inline auto spotlights_end() { return m_spotlight.end(); }
 private:
 	std::vector<directional_light> m_directional;
 	std::vector<positional_light> m_positional;

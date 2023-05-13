@@ -41,10 +41,10 @@ namespace shapes_detail
 	}
 }
 
-class cube_type : public render_type
+class cube_type : public rendervao_type
 {
 public:
-	cube_type() : render_type(shapes_detail::make_shape_vao(detail::cube_pts(), detail::cube_norms(), detail::cube_texture_coords(), 3)) {}
+	cube_type() : rendervao_type(shapes_detail::make_shape_vao(detail::cube_pts(), detail::cube_norms(), detail::cube_texture_coords(), 3)) {}
 
 	void draw(render_target& target) const override
 	{
@@ -99,10 +99,10 @@ void cube_obj<rotatable>::draw(render_target &target, const render_settings &set
 	render_obj::type->draw(target);
 }
 
-class rectangle_type : public render_type
+class rectangle_type : public rendervao_type
 {
 public:
-	rectangle_type() : render_type(shapes_detail::make_shape_vao(detail::rect_obj_vbo(), detail::rect_norm_vbo(), detail::rect_textPos_vbo(), 3)) {}
+	rectangle_type() : rendervao_type(shapes_detail::make_shape_vao(detail::rect_obj_vbo(), detail::rect_norm_vbo(), detail::rect_textPos_vbo(), 3)) {}
 
 	void draw(render_target& target) const override
 	{
@@ -168,7 +168,7 @@ void rectangle_obj<rotatable>::draw(render_target &target, const render_settings
 template <bool rotatable>
 void rectangle_obj<rotatable>::setup_buffer() const
 {
-	auto pos_vbo = render_obj::get_vao().get_attribute(render_shader::pos_attribute_loc);
+	auto pos_vbo = render_obj::get_vao()->get_attribute(render_shader::pos_attribute_loc);
 
 	auto data = pos_vbo. template get_data<vec3>(GL_WRITE_ONLY);
 	vec3 right = m_sz.x * m_right;
@@ -178,7 +178,7 @@ void rectangle_obj<rotatable>::setup_buffer() const
 	data[2] = right + up;
 	data[3] = up;
 
-	auto norm_vbo = render_obj::get_vao().get_attribute(render_shader::normal_attribute_loc);
+	auto norm_vbo = render_obj::get_vao()->get_attribute(render_shader::normal_attribute_loc);
 	auto norm = normalize(cross(right, -up));
 	
 	// test to see which is faster
@@ -245,7 +245,7 @@ void point_obj<2>::draw(render_target& target) const
 
 	detail::shader_lock slock;
 
-	point_obj_2_setup_buffer(m_size / 2, render_obj::get_vao());
+	point_obj_2_setup_buffer(m_size / 2, *render_obj::get_vao());
 
 	detail::setup_shader(shapes_detail::get_shader(), base_transformable_obj::model, nullptr, nullptr, nullptr, { 0, 0, 0, 1 });
 
@@ -259,7 +259,7 @@ void point_obj<2>::draw(render_target &target, const render_settings &settings) 
 
 	detail::shader_lock slock;
 
-	point_obj_2_setup_buffer(m_size / 2, render_obj::get_vao());
+	point_obj_2_setup_buffer(m_size / 2, *render_obj::get_vao());
 
 	render_shader &shader = settings.shader ? *settings.shader : shapes_detail::get_shader();
 	detail::setup_shader(shader, base_transformable_obj::model, settings.engine, nullptr, nullptr, settings.color);

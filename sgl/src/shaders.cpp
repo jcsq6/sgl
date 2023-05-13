@@ -264,12 +264,19 @@ void texture_material::send(shader &program, const std::string &name) const
 
 	glUseProgram(program.index());
 
-	std::string member = name + ".diffuse";
-	program.set_uniform(member, *diffuse);
+	std::string member;
+	if (diffuse)
+	{
+		member = name + ".diffuse";
+		program.set_uniform(member, *diffuse);
+	}
 	
-	member = name;
-	member += ".specular";
-	program.set_uniform(member, *specular);
+	if (specular)
+	{
+		member = name;
+		member += ".specular";
+		program.set_uniform(member, *specular);
+	}
 
 	member = name;
 	member += ".shininess";

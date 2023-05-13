@@ -6,7 +6,7 @@
 #include <algorithm>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "../dep/stb_image.h"
+#include "stb_image.h"
 
 SGL_BEG
 
@@ -23,7 +23,7 @@ void set_defaults()
 void texture::load(const std::string &file_name, GLenum target_format)
 {
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char *data = stbi_load(file_name.data(), &width, &height, &nr_channels, 0);
+	unsigned char *data = stbi_load(file_name.c_str(), &width, &height, &nr_channels, 0);
 
 	if (!data)
 	{

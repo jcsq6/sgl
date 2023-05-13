@@ -36,17 +36,30 @@ class render_type
 {
 public:
 	render_type() = default;
-	inline render_type(vao &&_vao) : m_vao{std::move(_vao)} {}
 	virtual ~render_type() = default;
 
 	// draws without shader setup
 	virtual void draw(render_target &target) const = 0;
 
 protected:
-	vao m_vao;
-
 	// call before drawing operations
 	void bind_target(render_target &target) const;
+
+	friend render_obj;
+};
+
+class rendervao_type : public render_type
+{
+public:
+	rendervao_type() = default;
+	inline rendervao_type(vao &&_vao) : m_vao{ std::move(_vao) } {}
+	virtual ~rendervao_type() = default;
+
+	// draws without shader setup
+	virtual void draw(render_target &target) const = 0;
+
+protected:
+	vao m_vao;
 
 	friend render_obj;
 };
@@ -66,7 +79,13 @@ protected:
 	// call before drawing operations
 	void bind_target(render_target &target) const;
 
-	inline const vao &get_vao() const { return type->m_vao; }
+	inline const vao *get_vao() const
+	{
+		const rendervao_type *vao_type = dynamic_cast<const rendervao_type *>(type);
+		if (vao_type)
+			return &vao_type->m_vao;
+		return nullptr;
+	}
 
 	const render_type *type;
 };

@@ -219,9 +219,9 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 	std::string vertex = "out vec3 view_pos;";
 	std::string fragment = "in vec3 view_pos;";
 
-	const std::string *ambient_light_name;
-	const std::string *diffuse_light_name;
-	const std::string *specular_light_name;
+	const std::string *ambient_material_name;
+	const std::string *diffuse_material_name;
+	const std::string *specular_material_name;
 	const std::string *name;
 	if (variables & variables::sgl_TextureMaterial)
 	{
@@ -229,9 +229,9 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 		static const std::string diffuse_name = "vec3(texture(sgl_TextureMaterial.diffuse, sgl_VertTextPos))";
 		static const std::string specular_name = "vec3(texture(sgl_TextureMaterial.specular, sgl_VertTextPos))";
 		static const std::string _name = "sgl_TextureMaterial";
-		ambient_light_name = &diffuse_name;
-		diffuse_light_name = &diffuse_name;
-		specular_light_name = &specular_name;
+		ambient_material_name = &diffuse_name;
+		diffuse_material_name = &diffuse_name;
+		specular_material_name = &specular_name;
 		name = &_name;
 	}
 	else
@@ -240,9 +240,9 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 		static const std::string diffuse_name = "sgl_Material.diffuse";
 		static const std::string specular_name = "sgl_Material.specular";
 		static const std::string _name = "sgl_Material";
-		ambient_light_name = &ambient_name;
-		diffuse_light_name = &diffuse_name;
-		specular_light_name = &specular_name;
+		ambient_material_name = &ambient_name;
+		diffuse_material_name = &diffuse_name;
+		specular_material_name = &specular_name;
 		name = &_name;
 	}
 	
@@ -277,7 +277,7 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 			"vec3 calc_directional(int i){"
 
 			"vec3 ambient = sgl_DirectionalLights[i].ambient *";
-		fragment += *ambient_light_name;
+		fragment += *ambient_material_name;
 		fragment += ';';
 		
 		fragment += 
@@ -285,7 +285,7 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 
 			"float diffuse_factor = max(dot(sgl_VertNormal, light_dir), 0.0);"
 			"vec3 diffuse = diffuse_factor * sgl_DirectionalLights[i].diffuse *";
-		fragment += *diffuse_light_name;
+		fragment += *diffuse_material_name;
 		fragment += ';';
 
 		fragment +=
@@ -295,9 +295,9 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 		fragment += *name;
 
 		fragment +=
-			".shininess); "
+			".shininess);"
 			"vec3 specular = specular_factor * sgl_DirectionalLights[i].specular * ";
-		fragment += *specular_light_name;
+		fragment += *specular_material_name;
 		fragment += ';';
 
 		fragment +=
@@ -311,7 +311,7 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 			"vec3 calc_positional(int i){"
 
 			"vec3 ambient = sgl_PositionalLights[i].ambient *";
-		fragment += *ambient_light_name;
+		fragment += *ambient_material_name;
 		fragment += ';';
 
 		fragment +=
@@ -320,7 +320,7 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 
 			"float diffuse_factor = max(dot(sgl_VertNormal, light_dir), 0.0);"
 			"vec3 diffuse = diffuse_factor * sgl_PositionalLights[i].diffuse *";
-		fragment += *diffuse_light_name;
+		fragment += *diffuse_material_name;
 		fragment += ';';
 
 		fragment +=
@@ -333,7 +333,7 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 		fragment +=
 			".shininess);"
 			"vec3 specular = specular_factor * sgl_PositionalLights[i].specular *";
-		fragment += *specular_light_name;
+		fragment += *specular_material_name;
 		fragment += ';';
 
 		fragment +=
@@ -348,7 +348,7 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 		fragment +=
 			"vec3 calc_spotlight(int i) {"
 			"vec3 ambient = sgl_Spotlights[i].ambient *";
-		fragment += *ambient_light_name;
+		fragment += *ambient_material_name;
 		fragment += ';';
 		
 		fragment +=
@@ -357,7 +357,7 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 
 			"float diffuse_factor = max(dot(sgl_VertNormal, light_dir), 0.0);"
 			"vec3 diffuse = diffuse_factor * sgl_Spotlights[i].diffuse *";
-		fragment += *diffuse_light_name;
+		fragment += *diffuse_material_name;
 		fragment += ';';
 
 		fragment +=
@@ -369,7 +369,7 @@ render_shader phong_shader(unsigned int num_directional, unsigned int num_positi
 		fragment +=
 			".shininess);"
 			"vec3 specular = specular_factor * sgl_Spotlights[i].specular *";
-		fragment += *specular_light_name;
+		fragment += *specular_material_name;
 		fragment += ';';
 
 		fragment +=

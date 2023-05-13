@@ -110,6 +110,7 @@ public:
 	}
 
 	void load(const std::string &file_name, GLenum target_format);
+
 	void load(GLenum target_format, const void *data, GLsizei width, GLsizei height, int channel_count, bool flip = true);
 	void reserve(GLenum target_format, GLsizei width, GLsizei height);
 

@@ -348,7 +348,7 @@ public:
 	{
 		other.id.id = 0;
 	}
-	inline buffer &operator=(buffer &&other)
+	inline buffer &operator=(buffer &&other) noexcept
 	{
 		destroy();
 		id.id = other.id.id;

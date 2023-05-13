@@ -174,10 +174,10 @@ namespace text_detail
 		return shader;
 	}
 
-	class char_type : public render_type
+	class char_type : public rendervao_type
 	{
 	public:
-		char_type() : render_type()
+		char_type() : rendervao_type()
 		{
 			detail::vao_lock lvao;
 			detail::vbo_lock lvbo;

@@ -23,10 +23,10 @@ namespace sprite_detail
 	}
 }
 
-class sprite_type : public render_type
+class sprite_type : public rendervao_type
 {
 public:
-	sprite_type() : render_type()
+	sprite_type() : rendervao_type()
 	{
 		detail::vao_lock lvao;
 		detail::vbo_lock lvbo;

@@ -33,18 +33,18 @@ int main()
 	sgl::mat4 view = cam.view();
 	sgl::set_view(&view);
 
-	sgl::cube_obj<false> cube({}, { 5, 5, 2 });
+	sgl::cube_obj<false> cube({}, { 2, 2, 2 });
 	//sgl::rectangle_obj<false> rect({}, { 2, 2 });
 
-	auto lighting_shader = sgl::phong_shader(0, 0, 1, sgl::variables::sgl_TextureMaterial);
+	auto lighting_shader = sgl::phong_shader(0, 1, 1, sgl::variables::sgl_TextureMaterial);
 	
 	sgl::lighting_engine engine;
-	//engine.add_positional_light(sgl::positional_light(indigo, purple, light_purple, { 3, 1, 0 }, .4f, 0.f, .07f));
+	engine.add_positional_light(sgl::positional_light({ .1, .1, .1 }, { 1, 1, 1 }, { .75, .75, .75 }, { 3, 1, 0 }, .4f, 0.f, .07f));
 	//engine.add_directional_light(sgl::directional_light({ 1, 1, 1 }, { 1, 1, 1 }, {.75, .75, .75}, {-1, -1, 0}));
-	engine.add_spotlight(sgl::spotlight({ 1, 1, 1 }, { 1, 1, 1 }, { .75, .75, .75 }, cam.get_dir(), cam.pos, sgl::radians(10.f), sgl::radians(40.f), 1, 0.09f, 0.032f));
+	engine.add_spotlight(sgl::spotlight({ .1, .1, .1 }, { 1, 1, 1 }, { .75, .75, .75 }, cam.get_dir(), cam.pos, sgl::radians(10.f), sgl::radians(40.f), 1, 0.09f, 0.032f));
 	auto spotlight = engine.spotlights_end() - 1;
-	//auto light = engine.positional_lights_end() - 1;
-	//sgl::cube_obj<false> light_cube(light->position, { .1, .1, .1 });
+	auto light = engine.positional_lights_end() - 1;
+	sgl::cube_obj<false> light_cube(light->position, { .1, .1, .1 });
 
 	sgl::texture diffuse_text("shield_diffuse.png", GL_RGBA);
 	sgl::texture specular_text("shield_specular.png", GL_RGBA);
@@ -133,8 +133,8 @@ int main()
 			spotlight->direction = -cam.get_dir();
 		}
 
-		//light->position = sgl::vec3(sgl::rot(dt.seconds() * sgl::pi() / 2, { 0, 1, 0 }) * sgl::vec4(light->position, 1));
-		//light_cube.set_loc(light->position);
+		light->position = sgl::vec3(sgl::rot(dt.seconds() * sgl::pi() / 2, { 0, 1, 0 }) * sgl::vec4(light->position, 1));
+		light_cube.set_loc(light->position);
 
 		window.clear({ 184.f / 255 , 184.f / 255, 184.f / 255, 1 });
 
@@ -142,6 +142,7 @@ int main()
 
 		sgl::render_settings settings({1, 1, 1, 1}, &lighting_shader, &engine, &material);
 		window.draw(cube, settings);
+		window.draw(light_cube, { sgl::vec4(1, 1, 0, 1) });
 		
 		/*for (int x = 0; x < 5; ++x)
 		{

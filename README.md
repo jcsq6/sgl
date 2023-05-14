@@ -9,3 +9,4 @@ Simple 3D graphics library
 - ASSIMP
 
 # Documentation
+Documentation is hosted [here](https://jcsq6.github.io/sgl/)

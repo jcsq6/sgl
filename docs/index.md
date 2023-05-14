@@ -1,3 +1,7 @@
+## Quick links
+- [Window Guide](#window-management)
+- [Input Guide](#key/button-class-handle)
+
 ### **Window Management**
 ---
 - Windows are created and handled with the class `sgl::window`.  
@@ -180,4 +184,4 @@ struct creation_hints {
     - sets the number of screen updates that the window will wait for between swapping buffers
     - **Parameters**
         - **interval** - number of screen updates
-#### Key/Button handle class
+#### Key/Button Class Handle

@@ -1,6 +1,6 @@
 ## Quick links
 - [Window Guide](#window-management)
-- [Input Guide](#key/button-class-handle)
+- [Input Guide](#key-button-class-handle)
 
 ### **Window Management**
 ---

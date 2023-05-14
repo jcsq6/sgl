@@ -191,7 +191,7 @@ namespace creation_code
 		is_maximized = 0x0040,                // bit to set if the window should be maximized
 		cursor_is_centered = 0x0080,          // bit to set if the cursor should be set to the center of full screen windows
 		framebuffer_is_transparent = 0x0100,  // bit to set if the framebuffer should be transparent (if supported)
-		should_scale_to_monitor = 0x0200, // bit to set if the window should not be scaled to whatever monitor it is placed on
+		should_scale_to_monitor = 0x0200,     // bit to set if the window should not be scaled to whatever monitor it is placed on
 		defaults = 0,
 	};
 }

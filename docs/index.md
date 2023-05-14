@@ -1,0 +1,183 @@
+### **Window Management**
+---
+- Windows are created and handled with the class `sgl::window`.  
+- An `sgl::window` handles window creation, destruction, and input. 
+
+#### **Creation Hints**
+```
+struct creation_hints {
+    int window_flags
+    int opengl_major
+    int opengl_minor
+}
+```
+- `creation_hints` is a class to be passed to the constructor of `sgl::window`
+    - **window_flags** - bit mask of flags defining how the window is created. (see below for various flags) defaults to 0
+    - **opengl_major** - major version of opengl. defaults to 4
+    - **opengl_minor** - minor version of opengl. defaults to 1
+- `creation_code` holds a set of flags that will be passed to `window_flags` through bitwise or
+    - `creation_code::is_not_resizable` - set to make the window not resizable
+    - `creation_code::is_invisible` - set to make the window invisible
+    - `creation_code::is_plain` - set to make the window have no decorations
+    - `creation_code::is_focused` - set to call focus on window creation
+    - `creation_code::should_auto_minimize` - set to automatically minimize window upon lost focus
+    - `creation_code::is_always_top` - set to make window remain above all other windows
+    - `creation_code::is_maximized` - set to make the window maximized on creation
+    - `creation_code::cursor_is_centered` - set to make the cursor centered on full screen windows only
+    - `creation_code::framebuffer_is_transparent` - set to make a transparent frambebuffer (if supported)
+    - `creation_code::should_scale_to_monitor` - set to make the window resized based on whatever monitor content scale it is placed on
+    - `creation_code::defaults` - none of the above options
+
+#### **Member functions**
+- `window(int width, int height, const std::string &name, creation_hints hints = {})`
+    - constructs window
+    - **Parameters**
+        - **width** - width of window (in screen coordinates)
+        - **height** - height of window (in screen coordinates)
+        - **name** - title of window
+        - **hints** - hints for window creation
+- `bool should_close() const`
+    - returns true if the window has received a closing signal
+- `void swap_buffers() cosnt`
+    - swaps double buffers
+- `void poll_events() const`
+    - gets all types of input if available
+- `void wait_events() const`
+    - waits for any input
+- `key *get_key(key_code code) const`
+    - gets handle to key specified by code (see below for specification of `key` and `key_code`)
+    - **Parameters**
+        - **code** - code of key
+- `key *get_mouse_button(mouse_code code) const`
+    - gets handle to mouse button specified by code (see below for specification of `key` and `mouse_code`)
+    - **Parameters**
+        - **code** - code of mouse button
+- `ivec2 drawable_size() const`
+    - returns either set logical size or framebuffer size to be used for drawing
+- `ivec2 get_window_size() const`
+    - returns window size in screen coordinates
+- `ivec2 get_framebuffer_size() const`
+    - returns window size in pixels
+- `ivec2 actual_size() const`
+    - returns `get_framebuffer_size()` (virtual method override)
+- `ivec2 get_window_pos() const`
+    - returns location of window in screen coordinates
+- `dvec2 get_mouse_pos() const`
+    - returns location of mouse in coordinates defined by `drawable_size()`
+- `void set_window_title(const std::string &name)`
+    - changes the title of the window
+    - **Parameters**
+        - **name** - new title of window
+- `void set_window_size(int width, int height)`
+    - changes the size of the window in screen coordinates
+    - **Parameters**
+        - **width** - width of window
+        - **height** - height of window
+- `void set_logical_size(int width, int height)`
+    - sets a logical size of the window that may be preffered over the framebuffer size
+    - **Parameters**
+        - **width** - logical width of window
+        - **height** - logical height of window
+- `void set_window_size_limits(ivec2 min_size, ivec2 max_size)`
+    - sets window minimum and maximum size in screen coordinates (to specify no limit on a component, set it to -1)
+    - **Parameters**
+        - **min_size** - minimum size limit for the window
+        - **max_size** - maximum size limit for the window
+- `void set_aspect_ratio(int numerator, int denominator)`
+    - sets the aspect ratio of the window that will be maintained on resize
+    - **Parameters**
+        - **numerator** - numerator of aspect ratio
+        - **denominator** - denominator of aspect ratio
+- `void set_window_pos(ivec2 screen_pos)`
+    - sets the position of the window in screen coordinates
+    - **Parameters**
+        - **screen_pos** - integer position
+- `void set_should_close(bool should_close)`
+    - sets whether or not the window should close
+    - **Parameters**
+        - **should_close** - true if the window should close and false if it should not close
+- `void set_cursor_mode(state_code state)`
+    - set state of cursor
+    - **Parameters**
+        - **state** - one of the following values
+            - `state_code::enabled`
+            - `state_code::hidden`
+            - `state_code::disabled`
+- `void set_close_callback(std::function<void()> callback)`
+    - set callback for when the user tries to close the window
+    - **Parameters**
+        - **callback** - function object returning void with no parameters
+- `void set_windowsize_callback(std::function<void(int, int)> callback)`
+    - set callback for when the size of the window changes
+    - **Parameters**
+        - **callback** - function object with the signature `void(width, height)`, `where` width and `height` represent the new size of the window (in screen coordinates)
+- `void set_framebuffer_callback(std::function<void(int, int)> callback)`
+    - set callback for when the framebuffer size changes
+    - There is no need to change the viewport with this callback, that is handled by the window
+    - **Parameters**
+        - **callback** - function object with the signature `void(width, height)`, where `width` and `height` repressent the new size of the framebuffer
+- `void set_contentscale_callback(std::function<void(float, float)> callback)`
+    - set callback for when the content scale of the window changes
+    - **Parameters**
+        - **callback** - function object with the signature `void(xscale, yscale)`, where `xscale` and `yscale` represent the new scale the current DPI and the platforms default DPI
+- `void set_windowpos_callback(std::function<void(int, int)> callback)`
+    - set callback for when the screen position of the window changes
+    - **Parameters**
+        - **callback** - function object with the signature `void(x, y)`, where `x` and `y` represent the new position of the window
+- `void set_windowminimize_callback(std::function<void(bool)> callback)`
+    - set callback for when the window is minimized
+    - **Parameters**
+        - **callback** - function object with the signature `void(minimized)`, where `minimized` is true if the window is minimized, false otherwise
+- `void set_windowmaximize_callback(std::function<void(bool)> callback)`
+    - set callback for when the window is maximized
+    - **Parameters**
+        - **callback** - function object with the signature `void(maximized)`, where `maximized` is true if the window is maximized, false otherwise
+- `void set_windowfocus_callback(std::function<void(bool)> callback)`
+    - set callback for when the window gains/loses focus
+    - **Parameters**
+        - **callback** - function object with the signature `void(focused)`, where `focused` is true if the window is focused, false otherwise
+- `void set_key_callback(std::function<void(key_code, int, action_code, int)> callback)`
+    - set callback for when a key is pressed or released
+    - **Parameters**
+        - **callback** - function object with the signature `void(key, scancode, action, mods)`, where `key` is the `key_code`, `scancode` is the platform-dependant scancode, `action` is the state of the key, and `mods` is an int with relevant modifier bits set (defined in `modifier_code` enum)
+- `void set_character_callback(std::function<void(unsigned int)> callback)`
+    - set callback for text input
+    - **Parameters**
+        - **callback** - function object with the signature `void(codepoint)`, where `codepoint` is a character in UTF-32
+- `void set_cursor_callback(std::function<void(double, double)> callback)`
+    - set callback for cursor position
+    - **Parameters**
+        - **callback** - function object with the signature `void(x, y)`, where `x` and `y` are the positions of the cursor in coordinates defined by `drawable_size()`
+- `void set_enterexit_callback(std::function<void(int)> callback)`
+    - set callback for cursor entering/exiting
+    - **Parameters**
+        - **callback** - function object with the signature `void(entered)`, where `entered` is true if the mouse entered the window, and false otherwise
+- `void set_mousebutton_callback(std::function<void(mouse_code, action_code, int)> callback)`
+    - set callback for when a mouse button is pressed or released
+    - **Parameters**
+        - **callback** - function object with the signature `void(button, action, mods)`, where `button` is the `mouse_code`, `action` is the `action_code`, and `mods` is an int with relevant modifier bits set (defined in `modifier_code` enum)
+- `void set_scroll_callback(std::function<void(double, double)> callback)`
+    - set callback for when the user scrolls the mouse
+    - **Parameters**
+        - **callback** - function object with the signature `void(xoff, yoff)`, where `xoff` and `yoff` are the horizontal and vertical offsets from the wheel, respectively
+
+- **The following functions remove their respective callbacks**
+    - `void remove_windowsize_callback()`
+    - `void remove_framebuffer_callback()`
+    - `void remove_contentscale_callback()`
+    - `void remove_windowpos_callback()`
+    - `void remove_windowminimize_callback()`
+    - `void remove_windowmaximize_callback()`
+    - `void remove_windowfocus_callback()`
+    - `void remove_key_callback()`
+    - `void remove_character_callback()`
+    - `void remove_cursor_callback()`
+    - `void remove_enterexit_callback()`
+    - `void remove_mousebutton_callback()`
+    - `void remove_scroll_callback()`
+
+- `static void set_swap_interval(int interval)`
+    - sets the number of screen updates that the window will wait for between swapping buffers
+    - **Parameters**
+        - **interval** - number of screen updates
+#### Key/Button handle class

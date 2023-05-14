@@ -1,0 +1,63 @@
+{
+	"backtrace" : 0,
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"id" : "sprite::@6c44a25adb316e358865"
+		},
+		{
+			"id" : "work::@e39b6a4190581bcf515a"
+		},
+		{
+			"id" : "lighting::@445147db1cc8ed480f52"
+		},
+		{
+			"id" : "model::@d882af48e3fdac751d0d"
+		},
+		{
+			"id" : "stb_image::@7fc27e499717b5ec07a7"
+		},
+		{
+			"id" : "assimp::@dea24a34a2b4320a991d"
+		},
+		{
+			"id" : "zlibstatic::@06f60315ee4241c2b9ca"
+		},
+		{
+			"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "text::@1cf030e2090f4f0c3390"
+		},
+		{
+			"id" : "shapes::@e6641a7fcf37f562564f"
+		},
+		{
+			"id" : "sgl::@24aabb3ee0bf3170b1b0"
+		}
+	],
+	"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
+	"isGeneratorProvided" : true,
+	"name" : "ALL_BUILD",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

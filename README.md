@@ -6,6 +6,6 @@ Simple 3D graphics library
 - GLFW
 - FREETYPE
 - STB_IMAGE
+- ASSIMP
 
-## Documentation
-Documentation has not yet been started
+# Documentation

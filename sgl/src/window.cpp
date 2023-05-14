@@ -38,13 +38,13 @@ struct callbacks
 	std::function<void(int, int)> framebuffer;
 	std::function<void(float, float)> contentscale;
 	std::function<void(int, int)> windowpos;
-	std::function<void(int)> windowminimize;
-	std::function<void(int)> windowmaximize;
-	std::function<void(int)> windowfocus;
+	std::function<void(bool)> windowminimize;
+	std::function<void(bool)> windowmaximize;
+	std::function<void(bool)> windowfocus;
 	std::function<void(key_code, int, action_code, int)> key;
 	std::function<void(unsigned int)> character;
 	std::function<void(double, double)> cursor;
-	std::function<void(int)> enter;
+	std::function<void(bool)> enter;
 	std::function<void(mouse_code, action_code, int)> mouse_button;
 	std::function<void(double, double)> scroll;
 	window *parent;
@@ -54,7 +54,7 @@ std::map<GLFWwindow *, callbacks> window_callbacks;
 
 void framebuffer_callback(GLFWwindow *window, int width, int height) { window_callbacks[window].framebuffer(width, height); }
 
-window::window(int width, int height, std::string_view name, window::creation_hints hints) : m_window{}, logical_size{-1, -1}
+window::window(int width, int height, const std::string &name, window::creation_hints hints) : m_window{}, logical_size{-1, -1}
 {
 	if (get_glfwlib().res != GLFW_TRUE)
 		return;
@@ -116,10 +116,8 @@ void mouse_pos_interp(sgl::dvec2 window_size, sgl::dvec2 target_size, sgl::dvec2
 	mouse_pos.y = target_size.y / -window_size.y * (mouse_pos.y - window_size.y);
 }
 
-void window::poll_events() const
+void window::update_input() const
 {
-	glfwPollEvents();
-
 	for (auto &k : keys)
 	{
 		k.second.was_pressed = k.second.pressed;
@@ -135,6 +133,18 @@ void window::poll_events() const
 	glfwGetCursorPos(m_window, &mouse_pos.x, &mouse_pos.y);
 
 	mouse_pos_interp(get_window_size(), drawable_size(), mouse_pos);
+}
+
+void window::poll_events() const
+{
+	glfwPollEvents();
+	update_input();
+}
+
+void window::wait_events() const
+{
+	glfwWaitEvents();
+	update_input();
 }
 
 key *window::get_key(key_code code) const
@@ -189,7 +199,7 @@ void window::set_swap_interval(int interval)
 	glfwSwapInterval(interval);
 }
 
-void window::set_window_title(std::string_view name)
+void window::set_window_title(const std::string &name)
 {
 	glfwSetWindowTitle(m_window, name.data());
 }
@@ -278,21 +288,21 @@ void window::set_windowpos_callback(std::function<void(int, int)> callback)
 }
 
 void windowminimize_callback(GLFWwindow *window, int minimized) { window_callbacks[window].windowminimize(minimized); }
-void window::set_windowminimize_callback(std::function<void(int)> callback)
+void window::set_windowminimize_callback(std::function<void(bool)> callback)
 {
 	window_callbacks[m_window].windowminimize = std::move(callback);
 	glfwSetWindowIconifyCallback(m_window, windowminimize_callback);
 }
 
 void windowmaximize_callback(GLFWwindow *window, int maximzed) { window_callbacks[window].windowmaximize(maximzed); }
-void window::set_windowmaximize_callback(std::function<void(int)> callback)
+void window::set_windowmaximize_callback(std::function<void(bool)> callback)
 {
 	window_callbacks[m_window].windowmaximize = std::move(callback);
 	glfwSetWindowMaximizeCallback(m_window, windowmaximize_callback);
 }
 
 void windowfocus_callback(GLFWwindow *window, int focused) { window_callbacks[window].windowfocus(focused); }
-void window::set_windowfocus_callback(std::function<void(int)> callback)
+void window::set_windowfocus_callback(std::function<void(bool)> callback)
 {
 	window_callbacks[m_window].windowfocus = std::move(callback);
 	glfwSetWindowFocusCallback(m_window, windowfocus_callback);
@@ -326,7 +336,7 @@ void window::set_cursor_callback(std::function<void(double, double)> callback)
 }
 
 void enterexit_callback(GLFWwindow *window, int entered) { window_callbacks[window].enter(entered); }
-void window::set_enterexit_callback(std::function<void(int)> callback)
+void window::set_enterexit_callback(std::function<void(bool)> callback)
 {
 	window_callbacks[m_window].enter = std::move(callback);
 	glfwSetCursorEnterCallback(m_window, enterexit_callback);

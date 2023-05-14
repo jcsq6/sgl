@@ -48,12 +48,13 @@ public:
 		int opengl_minor;
 	};
 
-	window(int width, int height, std::string_view name, creation_hints hints = {});
+	window(int width, int height, const std::string &name, creation_hints hints = {});
 	~window();
 
 	bool should_close() const;
 	void swap_buffers() const;
 	void poll_events() const;
+	void wait_events() const;
 
 	key *get_key(key_code code) const;
 	key *get_mouse_button(mouse_code code) const;
@@ -74,11 +75,11 @@ public:
 	/// @param interval number of screen updates
 	static void set_swap_interval(int interval);
 
-	void set_window_title(std::string_view name);
+	void set_window_title(const std::string &name);
 	void set_window_size(int width, int height);
 	void set_logical_size(int width, int height);
 
-	/// @brief set window minimum size and/or window maximum size (to specify no limit, set the component to -1)
+	/// @brief set window minimum size and window maximum size (to specify no limit, set the component to -1)
 	/// @param min_size minimum size
 	/// @param max_size maximum size
 	void set_window_size_limits(ivec2 min_size, ivec2 max_size);
@@ -113,19 +114,19 @@ public:
 	void set_windowpos_callback(std::function<void(int, int)> callback);
 
 	/// @brief set callback for when the window is minimized
-	/// @param callback callable with the signature void(minimized), where minimized is 1 if the window is minimized, 0 otherwise
-	void set_windowminimize_callback(std::function<void(int)> callback);
+	/// @param callback callable with the signature void(minimized), where minimized is true if the window is minimized, false otherwise
+	void set_windowminimize_callback(std::function<void(bool)> callback);
 
 	/// @brief set callback for when the window is maximized
-	/// @param callback callable with the signature void(maximized), where maximized is 1 if the window is maximized, 0 otherwise
-	void set_windowmaximize_callback(std::function<void(int)> callback);
+	/// @param callback callable with the signature void(maximized), where maximized is true if the window is maximized, false otherwise
+	void set_windowmaximize_callback(std::function<void(bool)> callback);
 
 	/// @brief set callback for when the window gains/loses focus
-	/// @param callback callable with the signature void(focused), where focused is 1 if the window is focused, 0 otherwise
-	void set_windowfocus_callback(std::function<void(int)> callback);
+	/// @param callback callable with the signature void(focused), where focused is true if the window is focused, false otherwise
+	void set_windowfocus_callback(std::function<void(bool)> callback);
 
 	/// @brief set callback for when a key is pressed or released
-	/// @param callback callable with the signature (key, scancode, action, mods), where key is the key_code,
+	/// @param callback callable with the signature void(key, scancode, action, mods), where key is the key_code,
 	/// 				scancode is the platform-dependant scancode, action is the state of the key, and mods is an int with relevant modifier bits set (defined in modifier_code enum)
 	void set_key_callback(std::function<void(key_code, int, action_code, int)> callback);
 
@@ -138,8 +139,8 @@ public:
 	void set_cursor_callback(std::function<void(double, double)> callback);
 
 	/// @brief set callback for cursor entering/exiting
-	/// @param callback callable with the signature void(entered), where entered is 1 if the mouse entered the window, and 0 otherwise
-	void set_enterexit_callback(std::function<void(int)> callback);
+	/// @param callback callable with the signature void(entered), where entered is true if the mouse entered the window, and false otherwise
+	void set_enterexit_callback(std::function<void(bool)> callback);
 
 	/// @brief set callback for when a mouse button is pressed or released
 	/// @param callback callable with the signature void(button, action, mods), where button is the mouse_code, action is the action_code, and
@@ -173,6 +174,8 @@ private:
 	mutable dvec2 mouse_pos;
 
 	ivec2 logical_size;
+
+	void update_input() const;
 
 	void bind_framebuffer() override;
 

@@ -14,8 +14,7 @@ else()
 endif()
 
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(Freetype REQUIRED)
 
-target_link_libraries(sgl PUBLIC OpenGL::GL GLEW::GLEW glfw Freetype::Freetype assimp::assimp stb_image)
+target_link_libraries(sgl PUBLIC OpenGL::GL glew glfw Freetype::Freetype assimp::assimp stb_image)

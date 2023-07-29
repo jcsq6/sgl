@@ -209,7 +209,7 @@ namespace model_detail
 
 texture &default_specular()
 {
-	static char data[4] = { 255, 255, 255, 255 };
+	static char data[4] = { '\xff', '\xff', '\xff', '\xff' };
 	static texture res(GL_RGBA, data, 1, 1, 4, false);
 	return res;
 }

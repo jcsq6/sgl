@@ -3,6 +3,9 @@
 #include "help.h"
 #include "context_lock/context_lock.h"
 
+#include "utils/error.h"
+#include <sstream>
+
 SGL_BEG
 namespace shapes_detail
 {
@@ -70,7 +73,7 @@ cube_obj<rotatable>::cube_obj() : render_obj(cube_type::get_instance())
 }
 
 template <bool rotatable>
-cube_obj<rotatable>::cube_obj(vec3 min, vec3 size) : render_obj(cube_type::get_instance()), movable_obj(min), scalable_obj(size)
+cube_obj<rotatable>::cube_obj(vec3 min, vec3 size) : render_obj(cube_type::get_instance()), movable_obj(min + size / 2), scalable_obj(size)
 {
 }
 
@@ -271,7 +274,7 @@ template <>
 void point_obj<3>::apply_transform() const
 {
 	vec3 size(m_size, m_size, m_size);
-	model *= translate(m_center - size / 2);
+	model *= translate(m_center);
 	model *= scale(size);
 }
 
@@ -339,46 +342,39 @@ void line_obj<scalable, rotatable>::draw(render_target &target, const render_set
 template <bool scalable, bool rotatable>
 void line_obj<scalable, rotatable>::apply_transform() const
 {
-	base_transformable_obj::model *= translate(movable_obj::m_loc);
-	base_transformable_obj::model *= scale({ m_width, m_width, distance(movable_obj::m_loc, m_end) });
-	base_transformable_obj::model *= rot(angle(movable_obj::m_loc, m_end), cross(movable_obj::m_loc, m_end));
+	vec3 diff = m_end - movable_obj::m_loc;
+	vec3 dir = normalize(diff);
+	static constexpr vec3 z_axis{0, 0, 1};
+	vec3 axis = cross(z_axis, dir);
 
-	transformable_obj<true, scalable, rotatable>::apply_transform();
+	// acos(dot(dir, z_axis)) = acos(dir.z)
+	float angle = acos(dir.z);
+
+	vec3 scalef{m_width, m_width, distance(movable_obj::m_loc, m_end)};
+	// vec3 scalef{m_width, m_width, m_width};
+
+	auto get = [&]()
+	{
+		vec3 ua = rot(angle, axis) * vec4(0, 1, 0, 1);
+		std::ostringstream buff;
+		buff << "angle: " << angle << '\n'
+			 << "axis: " << axis.x << ',' << axis.y << ',' << axis.z << '\n'
+			 << "dir: " << dir.x << ',' << dir.y << ',' << dir.z << '\n'
+			 << "rot(angle, axis) * vec3(0, 1, 0) = ua: " << ua.x << ',' << ua.y << ',' << ua.z << '\n'
+			 << "angle(ua, vec3(0, 1, 0)): " << sgl::angle(ua, vec3(0, 1, 0)) << '\n';
+		detail::log_error(error(buff.str(), error_code::uknown_error));
+		return 1;
+	};
+
+	static int i = get();
+	vec3 up_rot = rot(angle, axis) * vec4(0, 1, 0, 1);
+
+	
+	base_transformable_obj::model *= translate(movable_obj::m_loc + diff / 2);
+	// base_transformable_obj::model *= rot(-sgl::angle(up_rot, vec3(0, 1, 0)), dir);
+	base_transformable_obj::model *= rot(angle, axis);
+	base_transformable_obj::model *= scale(scalef);
 }
-
-//template <bool scalable, bool rotatable>
-//void setup_buffer()
-//{
-//	auto v = render_obj::get_vao().get_attribute(0);
-//	auto data = v. template get_data<vec3>(GL_READ_WRITE);
-//
-//	auto end = m_end - movable_obj::m_loc;
-//	auto dir = normalize(end);
-//	sgl::vec3 right;
-//	if (dir.x || dir.z)
-//		right = normalize(cross(dir, sgl::vec3{ 0, 1, 0 }));
-//	else
-//		right = { 0, 0, 1 };
-//	auto up = normalize(cross(right, dir));
-//	float half_width = m_width / 2;
-//
-//	// bottom right
-//	data[0] = half_width * (right - up);
-//
-//	// bottom left
-//	data[1] = -half_width * (right + up);
-//
-//	// top left
-//	data[2] = -half_width * (right - up);
-//
-//	// top right
-//	data[3] = half_width * (right + up);
-//
-//	data[4] = end + data[0];
-//	data[5] = end + data[1];
-//	data[6] = end + data[2];
-//	data[7] = end + data[3];
-//}
 
 template class rectangle_obj<false>;
 template class rectangle_obj<true>;

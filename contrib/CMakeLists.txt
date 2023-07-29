@@ -1,3 +1,4 @@
 set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(assimp)
 add_subdirectory(stb_image)
+add_subdirectory(glew)

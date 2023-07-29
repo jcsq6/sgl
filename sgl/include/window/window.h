@@ -31,7 +31,7 @@ public:
 		return was_pressed && pressed;
 	}
 
-	inline bool is_initialPress() const
+	inline bool is_initial_press() const
 	{
 		return pressed && !was_pressed;
 	}

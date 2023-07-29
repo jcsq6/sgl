@@ -194,14 +194,14 @@ const vbo &cube_norms()
 
 const vbo &cube_pts()
 {
-	constexpr vec3 A(1, 0, 0);
-	constexpr vec3 B(0, 0, 0);
-	constexpr vec3 C(0, 0, 1);
-	constexpr vec3 D(1, 0, 1);
-	constexpr vec3 E(1, 1, 0);
-	constexpr vec3 F(0, 1, 0);
-	constexpr vec3 G(0, 1, 1);
-	constexpr vec3 H(1, 1, 1);
+	constexpr vec3 A(.5, -.5, -.5);
+	constexpr vec3 B(-.5, -.5, -.5);
+	constexpr vec3 C(-.5, -.5, .5);
+	constexpr vec3 D(.5, -.5, .5);
+	constexpr vec3 E(.5, .5, -.5);
+	constexpr vec3 F(-.5, .5, -.5);
+	constexpr vec3 G(-.5, .5, .5);
+	constexpr vec3 H(.5, .5, .5);
 
 	static shape_data_array<3 * 12, 3> pts{ {
 			// FRONT FACE

@@ -39,7 +39,10 @@ int main()
 	sgl::point_obj<2> pt_2d({ 0, 3 }, .1f);
 	sgl::point_obj<3> pt_3d({ 0, 4, 0 }, .1f);
 
-	sgl::line_obj<false, false> line({ 0, 0, 4 }, { 2, 4, 0 });
+	sgl::point_obj<3> line_beg({0, 0, 0}, .1);
+	sgl::point_obj<3> line_end{{1, 1, 1}, .1};
+
+	sgl::line_obj<false, false> line(line_beg.get_center(), line_end.get_center(), .1);
 
 	auto cursor_callback = [&cam_changed, &cam, &window](double x, double y)
 	{
@@ -83,7 +86,7 @@ int main()
 		if (window.get_key(sgl::key_code::escape)->is_pressed())
 			window.set_should_close(true);
 
-		static constexpr float speed = 8;
+		static constexpr float speed = 4;
 
 		if (window.get_key(sgl::key_code::d)->is_pressed())
 		{
@@ -123,15 +126,26 @@ int main()
 
 		window.clear({ 1, 1, 1, 1 });
 
-		draw_grid(window, { -10, -10 }, { 10, 10 }, 1);
+		// draw_grid(window, { -10, -10 }, { 10, 10 }, 1);
 
-		window.draw(cube, {sgl::vec4(1, 0, 0, 1)});
-		window.draw(rect, {sgl::vec4(0, 1, 0, 1)});
-		window.draw(pt_2d, { sgl::vec4(1, 1, 0, 1) });
-		window.draw(pt_3d, { sgl::vec4(0, 1, 1, 1) });
-		window.draw(line);
+		// window.draw(cube, { sgl::vec4(1, 0, 0, 1) });
+		// window.draw(rect, { sgl::vec4(0, 1, 0, 1) });
+		// window.draw(pt_2d, { sgl::vec4(1, 1, 0, 1) });
+		// window.draw(pt_3d, { sgl::vec4(0, 1, 1, 1) });
+
+		window.draw(line_beg, { sgl::vec4(1, 0, 0, 1) });
+		window.draw(line_end, { sgl::vec4(1, 0, 0, 1) });
+		window.draw(line, { sgl::vec4(0, 0, 0, 1) });
 
 		window.swap_buffers();
+
+		sgl::error err;
+		while (sgl::get_error(err))
+		{
+			std::ofstream out("error.log", std::ofstream::app);
+			out << err.message() << '\n';
+			out << '\n';
+		}
 
 		dt.stop();
 	}

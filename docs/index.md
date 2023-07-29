@@ -1,11 +1,14 @@
 ## Quick links
 - [Window Guide](#window-management)
-- [Input Guide](#key-button-class-handle)
+- [Input Guide](#key-class-handle)
+    - [Key Codes](#key-codes)
+    - [Mouse Codes](#mouse-codes)
+- [Drawing guide](#drawing)
 
-### **Window Management**
----
-- Windows are created and handled with the class `sgl::window`.  
-- An `sgl::window` handles window creation, destruction, and input. 
+## **Window Management**
+Windows are created and handled with the class `sgl::window`.  
+An `sgl::window` handles window creation, destruction, and input.  
+`sgl::window` inherits from `sgl::render_target`, which is detailed [here](#render_target).
 
 #### **Creation Hints**
 ```
@@ -56,14 +59,10 @@ struct creation_hints {
     - gets handle to mouse button specified by code (see below for specification of `key` and `mouse_code`)
     - **Parameters**
         - **code** - code of mouse button
-- `ivec2 drawable_size() const`
-    - returns either set logical size or framebuffer size to be used for drawing
 - `ivec2 get_window_size() const`
     - returns window size in screen coordinates
 - `ivec2 get_framebuffer_size() const`
     - returns window size in pixels
-- `ivec2 actual_size() const`
-    - returns `get_framebuffer_size()` (virtual method override)
 - `ivec2 get_window_pos() const`
     - returns location of window in screen coordinates
 - `dvec2 get_mouse_pos() const`
@@ -184,4 +183,243 @@ struct creation_hints {
     - sets the number of screen updates that the window will wait for between swapping buffers
     - **Parameters**
         - **interval** - number of screen updates
-#### Key/Button Class Handle
+#### **Inherited methods**
+- `void draw(const render_obj &obj, const render_settings &settings)`
+    - draws object onto window. Further explained [here](#drawing).
+    - **Parameters**
+        - **obj** - object to be drawn
+        - **settings** - settings for render operation
+- `void draw(const render_obj &obj)`
+    - draws object onto window using default settings. Further explained [here](#drawing).
+    - **Parameters**
+        - **obj** - object to be drawn
+- `void clear(vec4 color, GLbitfield mask)`
+    - Clears the specified buffers of the windows
+    - **Parameters**
+        - **color** - clear color
+        - **mask** - bitmask with the specified buffer bits set (defaults to `GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT`)
+- `ivec2 drawable_size() const`
+    - returns either set logical size or framebuffer size to be used for drawing
+- `ivec2 actual_size() const`
+    - returns `get_framebuffer_size()`
+### **Input**
+---
+There are two main ways of getting input in sgl, and both are handled through the `sgl::window` class.  
+- By use of `sgl::key`  
+- By using callbacks
+
+#### `key`
+- `sgl::key`'s are handled by `sgl::window`, and are accessed through member functions `sgl::window::get_key` and `sgl::window::get_mouse_button`, which both return pointers to the key/button requested  
+
+#### **Member functions**
+- `bool is_pressed() const`
+    - returns true if the key/button is currently pressed
+- `bool is_repeated() const`
+    - returns true if the key/button has been pressed for more than one call of `sgl::window::poll_events` or `sgl::window::wait_events`
+- `bool is_initial_press() const`
+    - returns true if the key/button has been pressed for only one call of `sgl::window::poll_events` or `sgl::window::wait_events`
+#### Key Codes
+Key codes are found in enum `key_code` and to be used with `sgl::window::get_key`, and all of their values are self-explanatory
+- `key_code::uknown`
+- `key_code::space`
+- `key_code::apostrophe`
+- `key_code::comma`
+- `key_code::minus`
+- `key_code::period`
+- `key_code::slash`
+- `key_code::key_0`
+- `key_code::key_1`
+- `key_code::key_2`
+- `key_code::key_3`
+- `key_code::key_4`
+- `key_code::key_5`
+- `key_code::key_6`
+- `key_code::key_7`
+- `key_code::key_8`
+- `key_code::key_9`
+- `key_code::semicolon`
+- `key_code::equal`
+- `key_code::a`
+- `key_code::b`
+- `key_code::c`
+- `key_code::d`
+- `key_code::e`
+- `key_code::f`
+- `key_code::g`
+- `key_code::h`
+- `key_code::i`
+- `key_code::j`
+- `key_code::k`
+- `key_code::l`
+- `key_code::m`
+- `key_code::n`
+- `key_code::o`
+- `key_code::p`
+- `key_code::q`
+- `key_code::r`
+- `key_code::s`
+- `key_code::t`
+- `key_code::u`
+- `key_code::v`
+- `key_code::w`
+- `key_code::x`
+- `key_code::y`
+- `key_code::z`
+- `key_code::left_bracket`
+- `key_code::backslash`
+- `key_code::right_bracket`
+- `key_code::grave_accent`
+- `key_code::escape`
+- `key_code::enter`
+- `key_code::tab`
+- `key_code::backspace`
+- `key_code::insert`
+- `key_code::key_delete`
+- `key_code::right`
+- `key_code::left`
+- `key_code::down`
+- `key_code::up`
+- `key_code::page_up`
+- `key_code::page_down`
+- `key_code::home`
+- `key_code::end`
+- `key_code::caps_lock`
+- `key_code::scroll_lock`
+- `key_code::num_lock`
+- `key_code::print_screen`
+- `key_code::pause`
+- `key_code::f1`
+- `key_code::f2`
+- `key_code::f3`
+- `key_code::f4`
+- `key_code::f5`
+- `key_code::f6`
+- `key_code::f7`
+- `key_code::f8`
+- `key_code::f9`
+- `key_code::f10`
+- `key_code::f11`
+- `key_code::f12`
+- `key_code::f13`
+- `key_code::f14`
+- `key_code::f15`
+- `key_code::f16`
+- `key_code::f17`
+- `key_code::f18`
+- `key_code::f19`
+- `key_code::f20`
+- `key_code::f21`
+- `key_code::f22`
+- `key_code::f23`
+- `key_code::f24`
+- `key_code::f25`
+- `key_code::keypad_0`
+- `key_code::keypad_1`
+- `key_code::keypad_2`
+- `key_code::keypad_3`
+- `key_code::keypad_4`
+- `key_code::keypad_5`
+- `key_code::keypad_6`
+- `key_code::keypad_7`
+- `key_code::keypad_8`
+- `key_code::keypad_9`
+- `key_code::keypad_decimal`
+- `key_code::keypad_divide`
+- `key_code::keypad_multiply`
+- `key_code::keypad_subtract`
+- `key_code::keypad_add`
+- `key_code::keypad_enter`
+- `key_code::keypad_equal`
+- `key_code::left_shift`
+- `key_code::left_control`
+- `key_code::left_alt`
+- `key_code::left_super`
+- `key_code::right_shift`
+- `key_code::right_control`
+- `key_code::right_alt`
+- `key_code::right_super`
+- `key_code::menu`
+#### Mouse Codes
+Mouse codes are found in enum `mouse_code` and are to be used with `sgl::window::get_mouse_button`, and their names are self-explanatory
+- `mouse_code::button_1`
+- `mouse_code::button_2`
+- `mouse_code::button_3`
+- `mouse_code::button_4`
+- `mouse_code::button_5`
+- `mouse_code::button_6`
+- `mouse_code::button_7`
+- `mouse_code::button_8`
+- `mouse_code::left`
+- `mouse_code::right`
+- `mouse_code::middle`
+#### Example Code
+```
+sgl::window window(500, 500, "example");
+while (!window.should_close()) {
+    window.wait_events();
+    if (window.get_key(sgl::key_code::escape)->is_pressed())
+        window.set_should_close(true);
+}
+```
+
+#### Callbacks
+Callbacks are handled by `sgl::window`, and are all listed and explained in the `sgl::window` documentation [here](#window-management).
+
+## Drawing
+Drawing operations are handled by the following classes
+- `sgl::viewport`
+- `sgl::render_target`
+- `sgl::render_type`
+- `sgl::render_obj`
+- `sgl::render_settings`
+### `viewport`
+An `sgl::viewport` is a representation of a viewport for a `render_target`
+#### **Public member functions**
+- `void apply() const`
+    - calls `glViewport` with members `pos` and `size`
+#### **Public members**
+- `ivec2 pos`
+    - position of viewport
+    - passed to members `x` and `y` of `glViewport(int x, int y, int width, int height)`
+- `ivec2 size`
+    - size of viewport
+    - passed to members `width` and `height` of `glViewport(int x, int y, int width, int height)`
+
+### `render_target`
+An `sgl::render_target` is an abstract type representing a target for drawing operations.  
+Two common classes derived form this class are `sgl::window` and `sgl::texture_target`
+
+#### **Public member functions**
+- `void draw(const render_obj &obj, const render_settings &settings)`
+    - draws object onto target
+    - **Parameters**
+        - **obj** - object to be drawn
+        - **settings** - settings for render operation
+- `void draw(const render_obj &obj)`
+    - draws object onto target using default settings
+    - **Parameters**
+        - **obj** - object to be drawn
+- `void clear(vec4 color, GLbitfield mask)`
+    - Clears the specified buffers of the target
+    - **Parameters**
+        - **color** - clear color
+        - **mask** - bitmask with the specified buffer bits set (defaults to `GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT`)
+- `ivec2 drawable_size() const`
+    - pure virtual method used in drawing operations
+- `ivec2 actual_size() const`
+    - pure virtual method used to set viewport dimensions
+- `void set_viewport(viewport view)`
+    - sets viewport of target to be used for drawing operations
+    - **Parameters**
+        - **view** - viewport to be used
+- `void set_logical_viewport()`
+    - sets viewport to a default settings. (uses `render_target::actual_size`)
+
+#### **Protected member functions**
+- `void bind_framebuffer()`
+    - pure virtual method that is called before drawing operations. This function should bind the active framebuffer for the derived target
+#### **Protected members**
+- `viewport view`
+    - variable that will be used to set the viewport of drawing operations
+#### Derived classes of `render_target`
+- [texture_target](#texture-target)

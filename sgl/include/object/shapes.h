@@ -13,6 +13,9 @@ public:
 	cube_obj();
 	cube_obj(vec3 min, vec3 size);
 
+	inline void set_min(vec3 min) { movable_obj::set_loc(min + scalable_obj::m_scale / 2); }
+	void set_center(vec3 center) { movable_obj::set_loc(center); }
+
 	void draw(render_target& target) const override;
 	void draw(render_target &target, const render_settings &settings) const override;
 };
@@ -58,10 +61,10 @@ public:
 	point_obj();
 	point_obj(vec<float, dim> center, float size);
 
-	inline void set_size(float size) { m_size = size; data_changed(); }
+	inline void set_size(float size) { m_size = size; base_transformable_obj::data_changed(); }
 	inline float get_size() const { return m_size; }
 
-	inline void set_center(vec<float, dim> center) { m_center = center; data_changed(); }
+	inline void set_center(vec<float, dim> center) { m_center = center; base_transformable_obj::data_changed(); }
 	inline vec<float, dim> get_center() const { return m_center; }
 
 	void draw(render_target& target) const override;
@@ -80,11 +83,11 @@ public:
 	line_obj();
 	line_obj(vec3 beg, vec3 end, float line_width = .05);
 
-	inline void set_endpoint(vec3 end) { m_end = end; }
+	inline void set_endpoint(vec3 end) { m_end = end; base_transformable_obj::data_changed(); }
 
 	inline vec3 get_endpoint() const { return m_end; }
 
-	inline void set_line_width(float line_width) { m_width = line_width; }
+	inline void set_line_width(float line_width) { m_width = line_width; base_transformable_obj::data_changed(); }
 
 	inline float get_line_width() const { return m_width; }
 

@@ -39,10 +39,10 @@ int main()
 	sgl::point_obj<2> pt_2d({ 0, 3 }, .1f);
 	sgl::point_obj<3> pt_3d({ 0, 4, 0 }, .1f);
 
-	sgl::point_obj<3> line_beg({0, 0, 0}, .1);
-	sgl::point_obj<3> line_end{{1, 1, 1}, .1};
+	sgl::point_obj<3> line_beg({0, 0, 0}, .1f);
+	sgl::point_obj<3> line_end{{1, 1, 1}, .1f};
 
-	sgl::line_obj<false, false> line(line_beg.get_center(), line_end.get_center(), .1);
+	sgl::line_obj<false, false> line(line_beg.get_center(), line_end.get_center(), .1f);
 
 	auto cursor_callback = [&cam_changed, &cam, &window](double x, double y)
 	{

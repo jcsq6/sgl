@@ -142,13 +142,6 @@ private:
 	mutable bool changed;
 };
 
-/// @brief transformable render_obj
-/// @tparam movable set to true if the type should include translation transforms
-/// @tparam scalable set to true if the type should include scaling transforms
-/// @tparam rotatable set to true if the type should include rotation transforms
-template <bool movable, bool scalable, bool rotatable>
-class transformable_obj;
-
 template <>
 class transformable_obj<true, false, false> : public virtual transformable_obj<false, false, false>
 {

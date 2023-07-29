@@ -94,7 +94,7 @@ public:
 
 	/// @brief sets raw mouse motion either on or off (only available when cursor is disabled)
 	/// @param state true for raw mouse motion being on, false for off
-	void set_row_mouse_motion(bool state);
+	void set_raw_mouse_motion(bool state);
 
 	/// @brief set callback for when the user tries to close the window
 	/// @param callback callable with no parameters

@@ -106,6 +106,11 @@ struct creation_hints {
             - `state_code::enabled`
             - `state_code::hidden`
             - `state_code::disabled`
+- `void set_raw_mouse_motion(bool state)`
+    - set whether cursor acceleration is enabled or not
+    - only available when cursor is disabled (See `set_cursor_mode`)
+    - **Parameters**
+        - **state** - true for raw mouse motion being on, false for off
 - `void set_close_callback(std::function<void()> callback)`
     - set callback for when the user tries to close the window
     - **Parameters**
@@ -370,8 +375,13 @@ Drawing operations are handled by the following classes
 - `sgl::viewport`
 - `sgl::render_target`
 - `sgl::render_type`
-- `sgl::render_obj`
+- `sgl::rendervao_type`
 - `sgl::render_settings`
+- `sgl::render_obj`
+- `sgl::transformable_obj`
+- `sgl::shader`
+- `sgl::render_shader`
+- `sgl::lighting_engine`
 ### `viewport`
 An `sgl::viewport` is a representation of a viewport for a `render_target`
 #### **Public member functions**
@@ -405,7 +415,7 @@ Two common classes derived form this class are `sgl::window` and `sgl::texture_t
         - **color** - clear color
         - **mask** - bitmask with the specified buffer bits set (defaults to `GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT`)
 - `ivec2 drawable_size() const`
-    - pure virtual method used in drawing operations
+    - pure virtual method used in drawing operations that returns the size of target that can be drawn onto
 - `ivec2 actual_size() const`
     - pure virtual method used to set viewport dimensions
 - `void set_viewport(viewport view)`
@@ -423,3 +433,97 @@ Two common classes derived form this class are `sgl::window` and `sgl::texture_t
     - variable that will be used to set the viewport of drawing operations
 #### Derived classes of `render_target`
 - [texture_target](#texture-target)
+- [window](#window-management)
+
+### `render_type`
+An `sgl::render_type` is an abstract representation of a generic rendering type. It doesn't represent specific instances. Examples of this would be a cube, rectangle, or triangle.
+
+#### **Public member functions**
+- `void draw(render_target &target) const`
+    - pure virtual method that is called by instances of a `render_type`, which draws a base instance of the type without shader setup
+    - **Parameters**
+        - **target** - `render_target` to be drawn onto
+
+#### **Protected member functions**
+- `void bind_target(render_target &target) const`
+    - helper function that should be called before drawing operations. It applies the targets viewport and binds its framebuffer
+    - **Parameters**
+        - **target** - `render_target` that is being drawn onto
+
+#### Derived classes of `render_type`
+- [rendervao_type](#rendervao_type)
+
+### `rendervao_type`
+An abstract representation of a generic rendering type, which stores a vao. It doesn't represent specific instances. Examples would be a cube, rectangle, or triangle.
+
+#### **Public member functions**
+- `void draw(render_target &target) const`
+    - pure virtual method that is called by instances of a `rendervao_type`, which draws a base instance of the type without shader setup
+    - **Parameters**
+        - **target** - `render_target` to be drawn onto
+
+### `render_settings`
+A type holding settings useful for rendering operations.
+
+#### **Public member functions**
+- `render_settings()`
+    - constructs a `render_settings` with color black
+- `render_settings(vec4 col)`
+    - constructs a `render_settings` with color `col`
+    - **Parameters**
+        - **col** - color for rendering operation
+- `render_settings(render_shader *shader_program)`
+    - constructs a `render_settings` with color black and shader `shader_program`
+    - **Parameters**
+        - **shader_program** - a pointer to the [render_shader](#render_shader) object that will be used for drawing operation
+- `render_settings(const lighting_engine *light_engine)`
+    - constructs a `render_settings` with color black and lighting engine `light_engine`
+    - **Parameters**
+        - **light_engine** - a pointer to the [lighting_engine](#lighting_engine) object that will be used for drawing
+- `render_settings(const abstract_material *obj_material)`
+    - constructs a `render_settings` with color black and material `obj_material`
+    - **Parameters**
+        - **obj_material** - a pointer to the [abstract_material](#abstract_material) object that will be used for drawing
+- `render_settings(vec4 col, render_shader *shader_program, const lighting_engine *light_engine, const abstract_material *obj_material)`
+    - constructs a `render_settings` with the provided settings
+    - **Parameters**
+        - **col** - color for rendering operation
+        - **shader_program** - a pointer to the [render_shader](#render_shader) object that will be used for drawing operation
+        - **light_engine** - a pointer to the [lighting_engine](#lighting_engine) object that will be used for drawing
+        - **obj_material** - a pointer to the [abstract_material](#abstract_material) object that will be used for drawing
+
+### `render_obj`
+An `sgl::render_obj` represents an instance of a render_type.
+
+#### **Public member functions**
+- `void draw(render_target &target, const render_settings &settings) const`
+    - pure virtual method that draws an instance onto `target` with settings `settings`
+    - **Parameters**
+        - **target** - `render_target` to be drawn onto
+        - **settings** - `render_settings` that dictate settings for the draw operation
+- `void draw(render_target &target) const`
+    - virtual method that draws an instance onto `target` with default settings
+    - **Parameters**
+        - **target** - `render_target` to be drawn onto
+
+#### **Protected member functions**
+- `render_obj(const render_type &rtype)`
+    - constructs a `render_obj` of type `rtype`
+    - **Parameters**
+        - **rtype** - `render_type` representing the type of this instance
+- `render_obj()`
+    - construct a `render_obj` that has no type
+- `void bind_target(render_target &target) const`
+    - binds framebuffer of target to be used for drawing
+    - must be called before drawing operations
+    - **Parameters**
+        - **target** - `render_target` to be drawn onto
+- `const vao *get_vao() const`
+    - returns the `vao` owned by the type this `render_obj` stores, if it stores on, otherwise, `nullptr`
+
+#### Derived classes of `render_obj`
+- [transformable_obj](#transformable_obj)
+- [base_transformable_obj](#base_transformable_obj)
+- [movable_obj](#movable_obj)
+- [scalable_obj](#scalable_obj)
+- [rotatable_obj](#rotatable_obj)

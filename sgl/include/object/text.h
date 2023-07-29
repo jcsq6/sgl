@@ -96,6 +96,30 @@ private:
 class text : public render_obj
 {
 public:
+	inline text() : render_obj(),
+					m_origin{},
+					m_dir{1, 0, 0},
+					m_up{0, 1, 0},
+					m_scale{1, 1},
+					m_rot_origin{},
+					m_axis{0, 0, 1},
+					m_font{},
+					m_angle{},
+					m_data{}
+	{
+	}
+	inline text(font &_font) : render_obj(),
+							   m_origin{},
+							   m_dir{1, 0, 0},
+							   m_up{0, 1, 0},
+							   m_scale{1, 1},
+							   m_rot_origin{},
+							   m_axis{0, 0, 1},
+							   m_font{&_font},
+							   m_angle{},
+							   m_data{}
+	{
+	}
 	inline text(std::basic_string_view<char> txt, font &_font) : render_obj(),
 																 m_origin{},
 																 m_dir{1, 0, 0},

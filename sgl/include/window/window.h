@@ -92,6 +92,10 @@ public:
 
 	void set_cursor_mode(state_code state);
 
+	/// @brief sets raw mouse motion either on or off (only available when cursor is disabled)
+	/// @param state true for raw mouse motion being on, false for off
+	void set_row_mouse_motion(bool state);
+
 	/// @brief set callback for when the user tries to close the window
 	/// @param callback callable with no parameters
 	void set_close_callback(std::function<void()> callback);

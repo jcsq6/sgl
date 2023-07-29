@@ -86,7 +86,7 @@ int main()
 		if (window.get_key(sgl::key_code::escape)->is_pressed())
 			window.set_should_close(true);
 
-		static constexpr float speed = 4;
+		static constexpr float speed = 1;
 
 		if (window.get_key(sgl::key_code::d)->is_pressed())
 		{
@@ -118,6 +118,10 @@ int main()
 			cam.move_up((float)dt.seconds() * -speed);
 			cam_changed = true;
 		}
+
+		sgl::vec3 new_end = sgl::rot((float)dt.seconds() / 4, {0, 1, 0}) * sgl::vec4(line_end.get_center(), 1.0);
+		line_end.set_center(new_end);
+		line.set_endpoint(new_end);
 
 		if (cam_changed)
 			view = cam.view();

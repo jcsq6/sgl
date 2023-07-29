@@ -343,35 +343,16 @@ template <bool scalable, bool rotatable>
 void line_obj<scalable, rotatable>::apply_transform() const
 {
 	vec3 diff = m_end - movable_obj::m_loc;
-	vec3 dir = normalize(diff);
-	static constexpr vec3 z_axis{0, 0, 1};
-	vec3 axis = cross(z_axis, dir);
+	float diff_mag = magnitude(diff);
+	vec3 dir = diff / diff_mag;
+	static constexpr vec3 y_axis{0, 1, 0};
+	vec3 axis = cross(y_axis, dir);
 
-	// acos(dot(dir, z_axis)) = acos(dir.z)
-	float angle = acos(dir.z);
+	float angle = acos(dir.y);
 
-	vec3 scalef{m_width, m_width, distance(movable_obj::m_loc, m_end)};
-	// vec3 scalef{m_width, m_width, m_width};
-
-	auto get = [&]()
-	{
-		vec3 ua = rot(angle, axis) * vec4(0, 1, 0, 1);
-		std::ostringstream buff;
-		buff << "angle: " << angle << '\n'
-			 << "axis: " << axis.x << ',' << axis.y << ',' << axis.z << '\n'
-			 << "dir: " << dir.x << ',' << dir.y << ',' << dir.z << '\n'
-			 << "rot(angle, axis) * vec3(0, 1, 0) = ua: " << ua.x << ',' << ua.y << ',' << ua.z << '\n'
-			 << "angle(ua, vec3(0, 1, 0)): " << sgl::angle(ua, vec3(0, 1, 0)) << '\n';
-		detail::log_error(error(buff.str(), error_code::uknown_error));
-		return 1;
-	};
-
-	static int i = get();
-	vec3 up_rot = rot(angle, axis) * vec4(0, 1, 0, 1);
-
+	vec3 scalef{m_width, diff_mag, m_width};
 	
 	base_transformable_obj::model *= translate(movable_obj::m_loc + diff / 2);
-	// base_transformable_obj::model *= rot(-sgl::angle(up_rot, vec3(0, 1, 0)), dir);
 	base_transformable_obj::model *= rot(angle, axis);
 	base_transformable_obj::model *= scale(scalef);
 }

@@ -240,6 +240,11 @@ void window::set_cursor_mode(state_code state)
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL + static_cast<int>(state));
 }
 
+void window::set_row_mouse_motion(bool state)
+{
+	glfwSetInputMode(m_window, GLFW_RAW_MOUSE_MOTION, state);
+}
+
 void close_callback(GLFWwindow *window) { window_callbacks[window].close(); }
 void window::set_close_callback(std::function<void()> callback)
 {

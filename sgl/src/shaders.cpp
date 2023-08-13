@@ -3,7 +3,6 @@
 #include "context_lock/context_lock.h"
 #include "utils/error.h"
 #include <GL/glew.h>
-#include <iostream>
 
 SGL_BEG
 class shader_source

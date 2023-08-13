@@ -15,7 +15,7 @@ struct sgl_glfw
 	{
 		res = glfwInit();
 		if (res != GLFW_TRUE)
-			detail::log_error(error("GLFW initializatino failed with code " + std::to_string(res) + '.', error_code::glfw_initialization_failure));
+			detail::log_error(error("GLFW initialization failed with code " + std::to_string(res) + '.', error_code::glfw_initialization_failure));
 	}
 	~sgl_glfw()
 	{
